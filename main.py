@@ -20,12 +20,16 @@ except:
 
 
 ############################################################################################################################
+f = open('conf.txt')
+userid, passwd = f.readline().split()
+f.close()
+
 option = 'alert(.*?);'
 option1 = '<td bgcolor=\"FFFBF0\" align=\"center\" colspan=5>(.*?)MB'
 option2 = '<td bgcolor=\"FFFBF0\" align=\"center\" colspan=5>(.*?)Hours'
 
 def login():
-	params = urllib.urlencode( {'userid':'userid','password':'passwd','serivce':'intenet','chap':'0','random':'internet','x':'25','y':'12'} )
+	params = urllib.urlencode( {'userid':userid,'password':passwd,'serivce':'intenet','chap':'0','random':'internet','x':'25','y':'12'} )
 	headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
 	conn = httplib.HTTPConnection( "1.1.1.1" )  
 	conn.request( "POST", "/passwd.magi", params, headers )
@@ -83,7 +87,7 @@ def checkflow():
 	conn1.close()
 
 	conn2 = httplib.HTTPConnection("a.lzu.edu.cn")
-	params = urllib.urlencode( {'user_id':'userid','passwd':'passwd','validateCode':s} )
+	params = urllib.urlencode( {'user_id':userid,'passwd':passwd,'validateCode':s} )
 	#print params
 	conn2.request( 'POST', '/selfLogonAction.do', params, headers = headers)
 	response2 = conn2.getresponse()
