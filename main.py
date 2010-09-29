@@ -35,7 +35,7 @@ def login():
 	#print data
 	result = re.findall(option, data)
 	if len(result)>0:
-		return re.findall(option,data)[0].split('\"')[1]
+		return re.findall(option,data)[0].split('\"')[1].decode('gb2312')
 	else :
 		return 1
 
@@ -74,7 +74,7 @@ def checkflow():
 	#print response1.getheaders()
 	data = response1.read()
 	#print data
-	img = open('code.jpg','w')
+	img = open('code.jpg','wb')
 	img.write(data)
 	img.close()
 	image = Image.open('code.jpg')
@@ -146,7 +146,7 @@ class Interface:
 	def checkflow(self, widget, data=None):
 		#print 'checkflow'
 		checkflow()
-		self.Dialog(None, data='您本月已经使用的流量为'+MB+'\n您本月已经上网'+HOUR+'小时')
+		self.Dialog(None, data='您本月已经使用的流量为 %s MB\n您本月已经上网 %s 小时' % (MB, HOUR))
 
 
 	def getMenu(self, window):
