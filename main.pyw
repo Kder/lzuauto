@@ -1,5 +1,56 @@
 #!/usr/bin/env python
 #-*-coding=utf-8-*
+
+'''自动登录兰大上网认证系统。
+
+主要功能
+
+    一键登录/退出、流量查询（支持验证码识别）
+
+使用方法
+
+    解压后，修改conf.txt，把自己的用户名密码填入。 运行main.py 就会出来主界面。
+
+系统要求
+
+    Linux下面需要的依赖：
+
+        python(标准发行版里面的版本都应该支持，理论上不支持python3.0且未测试)
+        pygtk
+        python-imaging(PIL库)
+        tesseract(一个ocr工具，项目主页 http://code.google.com/p/tesseract-ocr/ ）
+        各大发行版的源中应该都有上面的包，在Arch Linux和Gentoo Linux下测试通过。
+        
+    Windows下需要的依赖：
+
+        python-2.5.4.msi
+        PIL-1.1.7.win32-py2.5.exe
+        pycairo-1.4.12-2.win32-py2.5.exe
+        pygobject-2.14.2-2.win32-py2.5.exe
+        pygtk-2.12.1-1.win32-py2.5.exe
+        
+    以上软件请到分别下列地址下载：
+
+        http://www.python.org
+        http://www.pythonware.com/products/pil/
+        http://ftp.gnome.org/pub/GNOME/binaries/win32/pygtk/
+        http://ftp.gnome.org/pub/GNOME/binaries/win32/pycairo/
+        http://ftp.gnome.org/pub/GNOME/binaries/win32/pygobject/
+'''
+
+__author__= 'ysjdxcn'
+__copyright__ = 'Copyright 2010 ysjdxcn'
+__credits__ = ['ysjdxcn','Kder']
+__version__ = '1.0.0'
+__date__ = '2010-10-1'
+__maintainer__ = ['ysjdxcn','Kder']
+__email__ = ['ysjdxcn (#) gmail dot com', 'kderlin (#) gmail dot com']
+__url__ = ['http://ranhouzenyang.com/', 'http://www.kder.info']
+__license__ = 'GNU General Public License v3'
+__status__ = 'Release'
+__projecturl__ = 'http://code.google.com/p/lzuauto/'
+
+
 from pytesser import *
 import urllib, httplib, time, re, sys
 
@@ -16,10 +67,8 @@ try:
 except:
 	print 'gtk needed'
 
+################################################################################
 
-
-
-############################################################################################################################
 f = open('conf.txt')
 userid, passwd = f.readline().split()
 f.close()
@@ -123,11 +172,7 @@ def checkflow():
 def checkstatus():
 	pass
 
-
-############################################################################################################################
-
-
-
+################################################################################
 
 class Interface:
 	'''interface:
@@ -184,7 +229,7 @@ class Interface:
 		win.connect('destroy', lambda wid: gtk.main_quit())
 		win.connect('delete_event', lambda a1,a2:gtk.main_quit())
 		win.set_title('兰州大学校园网工具')
-		win.set_size_request(160, 120)
+		win.set_size_request(200, 120)
 		win.set_position(gtk.WIN_POS_CENTER)
 		
 		self.menu_items=(
@@ -222,3 +267,5 @@ class Interface:
 if __name__ == "__main__":
 	start = Interface()
 	gtk.main()
+
+#vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4
