@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#-*-coding=utf-8-*
+#-*- coding=utf-8 -*-
 
 '''自动登录兰大上网认证系统。
 
@@ -9,7 +9,7 @@
 
 使用方法
 
-    解压后，修改conf.txt，把自己的用户名密码填入。 运行main.py 就会出来主界面。
+    解压后，修改conf.txt，把自己的用户名密码填入。 运行 main.pyw 就会出来主界面。
 
 系统要求
 
