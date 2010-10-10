@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 #-*- coding=utf-8 -*-
 
-'''自动登录兰大上网认证系统。
+'''
+lzuauto - 自动登录兰大上网认证系统。
 
 主要功能
 
@@ -15,31 +16,31 @@
 
     Linux下面需要的依赖：
 
-        python(标准发行版里面的版本都应该支持，理论上不支持python3.0且未测试)
-        pygtk
-        python-imaging(PIL库)
-        tesseract(一个ocr工具，项目主页 http://code.google.com/p/tesseract-ocr/ ）
-        各大发行版的源中应该都有上面的包，在Arch Linux和Gentoo Linux下测试通过。
-        
+		python(标准发行版里面的版本都应该支持，理论上不支持python3.0且未测试)
+		pygtk
+		python-imaging(PIL库)
+		tesseract(一个ocr工具，项目主页 http://code.google.com/p/tesseract-ocr/ ）
+		各大发行版的源中应该都有上面的包，在Arch Linux和Gentoo Linux下测试通过。
+		
     Windows下需要的依赖：
 
-        python-2.5.4.msi
-        PIL-1.1.7.win32-py2.5.exe
-        pycairo-1.4.12-2.win32-py2.5.exe
-        pygobject-2.14.2-2.win32-py2.5.exe
-        pygtk-2.12.1-1.win32-py2.5.exe
-        
+		python-2.5.4.msi
+		PIL-1.1.7.win32-py2.5.exe
+		pycairo-1.4.12-2.win32-py2.5.exe
+		pygobject-2.14.2-2.win32-py2.5.exe
+		pygtk-2.12.1-1.win32-py2.5.exe
+		
     以上软件请到分别下列地址下载：
 
-        http://www.python.org
-        http://www.pythonware.com/products/pil/
-        http://ftp.gnome.org/pub/GNOME/binaries/win32/pygtk/
-        http://ftp.gnome.org/pub/GNOME/binaries/win32/pycairo/
-        http://ftp.gnome.org/pub/GNOME/binaries/win32/pygobject/
+		http://www.python.org
+		http://www.pythonware.com/products/pil/
+		http://ftp.gnome.org/pub/GNOME/binaries/win32/pygtk/
+		http://ftp.gnome.org/pub/GNOME/binaries/win32/pycairo/
+		http://ftp.gnome.org/pub/GNOME/binaries/win32/pygobject/
 '''
 
 __author__= 'ysjdxcn'
-__copyright__ = 'Copyright 2010 ysjdxcn'
+__copyright__ = 'Copyright 2010 ysjdxcn & Kder'
 __credits__ = ['ysjdxcn','Kder']
 __version__ = '1.0.0'
 __date__ = '2010-10-1'
@@ -54,6 +55,12 @@ __projecturl__ = 'http://code.google.com/p/lzuauto/'
 from pytesser import *
 import urllib, httplib, time, re, sys
 
+import os
+
+os.sys.path.append('.')
+os.sys.path.append('./glib')
+os.sys.path.append('./gtk')
+os.sys.path.append('./gobject')
 
 try:
 	import pygtk
@@ -64,7 +71,8 @@ except:
 
 try:
 	import gtk
-except:
+except Exception as e:
+	print e
 	print 'gtk needed'
 
 ################################################################################
@@ -177,10 +185,23 @@ def checkstatus():
 class Interface:
 	'''interface:
 	The interface of this.'''
+	
+	ui = '''<ui>
+    <menubar name="MenuBar">
+      <menu action="File">
+		<menuitem action="Quit"/>
+      </menu>
+      <menu action="Help">
+		<menuitem action="About"/>
+		<menuitem action="Usage"/>
+      </menu>
+    </menubar>
+    </ui>'''
+	
 	def login(self, widget, data=None):
 		#print 'login'
 		result = login()
-		if result == 1 :
+		if result == 1 or '0.00' in result:
 			self.Dialog(None, "登录成功")
 		else :
 			self.Dialog(None, result)
@@ -196,15 +217,6 @@ class Interface:
 		#print 'checkflow'
 		checkflow()
 		self.Dialog(None, data='您本月已经使用的流量为 %s MB\n您本月已经上网 %s 小时' % (MB, HOUR))
-
-
-	def getMenu(self, window):
-		accel_group = gtk.AccelGroup()
-		item_factory = gtk.ItemFactory(gtk.MenuBar, "<main>", accel_group)
-		item_factory.create_items(self.menu_items)
-		window.add_accel_group(accel_group)
-		self.item_factory = item_factory
-		return item_factory.get_widget("<main>")
 	
 	def Dialog(self, widget, data=None):
 		dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_INFO, gtk.BUTTONS_NONE, data)
@@ -215,15 +227,31 @@ class Interface:
 	def DestroyAll(self, widget, data=None):
 		gtk.main_quit()
 
-	def About(self, widget, data=None):
-		dialog = gtk.Dialog('关于', None, gtk.DIALOG_DESTROY_WITH_PARENT, (gtk.STOCK_OK, gtk.RESPONSE_OK))
+	def About(self, widget):
+		about = gtk.AboutDialog()
+		about.set_program_name("lzuauto")
+		about.set_version("1.0")
+		about.set_copyright("(c) ysjdxcn & Kder")
+		about.set_license('GPLv3')
+#		about.set_wrap_license(1)
+		about.set_authors(['ysjdxcn','Kder'])
+		about.set_comments("自动登录兰大上网认证系统\n\n欢迎使用此工具，如果您有任何意见或者建议\n请访问项目主页")
+		about.set_website("http://code.google.com/p/lzuauto/")
+		about.set_website_label("项目主页：http://lzuauto.googlecode.com")
+#		about.set_logo(gtk.gdk.pixbuf_new_from_file("code.jpg"))
+		about.run()
+		about.destroy()
+    
+	def Usage(self, widget):
+		dialog = gtk.Dialog('用法', None, gtk.DIALOG_DESTROY_WITH_PARENT, (gtk.STOCK_OK, gtk.RESPONSE_OK))
 		label = gtk.Label()
-		data = "欢迎使用此工具，如果您有任何意见或者建议\n请访问项目主页<a href='http://code.google.com/p/lzuauto/'>http://lzuauto.googlecode.com</a>\n"
+		data = "%s" % __doc__
 		label.set_markup(data)
 		dialog.vbox.pack_start(label)
 		label.show()
 		dialog.run()
 		dialog.destroy()
+		
 	def __init__(self):
 		win = gtk.Window(gtk.WINDOW_TOPLEVEL)
 		win.connect('destroy', lambda wid: gtk.main_quit())
@@ -231,15 +259,32 @@ class Interface:
 		win.set_title('兰州大学校园网工具')
 		win.set_size_request(200, 120)
 		win.set_position(gtk.WIN_POS_CENTER)
-		
-		self.menu_items=(
-				("/_File", None, None, 0, "<Branch>"),
-				("/File/_Quit","<control>Q", self.DestroyAll, 0, None),
-				("/_Help", None, None, 0, "<Branch>"),
-				("/Help/_About", None, self.About, 0, None)
-				)
-		menubar = self.getMenu(win)
-		
+
+		main_vbox = gtk.VBox(False, 0)
+
+		uimanager = gtk.UIManager()
+		accelgroup = uimanager.get_accel_group()
+		win.add_accel_group(accelgroup)
+		actiongroup = gtk.ActionGroup('UIManagerExample')
+		self.actiongroup = actiongroup
+		actiongroup.add_actions([('Quit', gtk.STOCK_QUIT, '退出(_Q)', None,
+		                          '退出', self.DestroyAll),
+		                          ('About', gtk.STOCK_ABOUT, '关于(_A)', None,
+		                          '关于', self.About),
+		                          ('Usage', gtk.STOCK_INFO, '用法(_U)', None,
+		                          '用法', self.Usage),
+		                         ('File', gtk.STOCK_FILE, '文件(_F)'),
+		                         ('Help', gtk.STOCK_HELP, '帮助(_H)'),
+		                         
+		                         ])
+		actiongroup.get_action('Quit').set_property('short-label', '_Quit')
+
+		uimanager.insert_action_group(actiongroup, 0)
+		uimanager.add_ui_from_string(self.ui)
+		menubar = uimanager.get_widget('/MenuBar')
+		main_vbox.pack_start(menubar, False)
+
+
 		button1 = gtk.Button("登录外网")
 		button1.connect("clicked", self.login, "登录")
 
@@ -252,13 +297,10 @@ class Interface:
 		button4 = gtk.Button("退出程序")
 		button4.connect("clicked", self.DestroyAll)
 
-		main_vbox = gtk.VBox(False, 0)
-		main_vbox.pack_start(menubar, False, False, 0)
 		main_vbox.pack_start(button1, True, True, 0)
 		main_vbox.pack_start(button2, True, True, 0)
 		main_vbox.pack_start(button3, True, True, 0)
 		main_vbox.pack_start(button4, True, True, 0)
-		
 		
 		win.add(main_vbox)
 		win.show_all()
