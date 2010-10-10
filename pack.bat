@@ -1,0 +1,1 @@
+"F:\Program Files\7-Zip\7z.exe" a -t7z -xr!*.svn* lzuauto-1.0-src.7z @file_list.txt

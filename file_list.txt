@@ -1,0 +1,11 @@
+main.pyw
+errors.py
+ocr.py
+pytesser.py
+setup.py
+util.py
+conf.txt
+py2exe.bat
+tesseract.exe
+tessdata
+
