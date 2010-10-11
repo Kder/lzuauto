@@ -6,15 +6,15 @@ lzuauto - 自动登录兰大上网认证系统。
 
 主要功能
 
-    一键登录/退出、流量查询（支持验证码识别）
+	一键登录/退出、流量查询（支持验证码识别）
 
 使用方法
 
-    解压后，修改conf.txt，把自己的用户名密码填入。 运行 main.pyw 就会出来主界面。
+	解压后，修改conf.txt，把自己的用户名密码填入。 运行 main.pyw 就会出来主界面。
 
 系统要求
 
-    Linux下面需要的依赖：
+	Linux下面需要的依赖：
 
 		python(标准发行版里面的版本都应该支持，理论上不支持python3.0且未测试)
 		pygtk
@@ -22,7 +22,7 @@ lzuauto - 自动登录兰大上网认证系统。
 		tesseract(一个ocr工具，项目主页 http://code.google.com/p/tesseract-ocr/ ）
 		各大发行版的源中应该都有上面的包，在Arch Linux和Gentoo Linux下测试通过。
 		
-    Windows下需要的依赖：
+	Windows下需要的依赖：
 
 		python-2.5.4.msi
 		PIL-1.1.7.win32-py2.5.exe
@@ -30,7 +30,7 @@ lzuauto - 自动登录兰大上网认证系统。
 		pygobject-2.14.2-2.win32-py2.5.exe
 		pygtk-2.12.1-1.win32-py2.5.exe
 		
-    以上软件请到分别下列地址下载：
+	以上软件请到分别下列地址下载：
 
 		http://www.python.org
 		http://www.pythonware.com/products/pil/
@@ -43,7 +43,7 @@ __author__= 'ysjdxcn'
 __copyright__ = 'Copyright 2010 ysjdxcn & Kder'
 __credits__ = ['ysjdxcn','Kder']
 __version__ = '1.0.0'
-__date__ = '2010-10-1'
+__date__ = '2010-10-11'
 __maintainer__ = ['ysjdxcn','Kder']
 __email__ = ['ysjdxcn (#) gmail dot com', 'kderlin (#) gmail dot com']
 __url__ = ['http://ranhouzenyang.com/', 'http://www.kder.info']
@@ -74,12 +74,17 @@ try:
 except Exception as e:
 	print e
 	print 'gtk needed'
+	sys.exit(2)
 
 ################################################################################
 
-f = open('conf.txt')
-userid, passwd = f.readline().split()
-f.close()
+try:
+	f = open('conf.txt')
+	userid, passwd = f.readline().split()
+	f.close()
+except:
+	print 'Error: Cannot open conf.txt, please make sure that the file exists and is accessible.'
+	sys.exit(3)
 
 option = 'alert(.*?);'
 option1 = '<td bgcolor=\"FFFBF0\" align=\"center\" colspan=5>(.*?)MB'
@@ -153,7 +158,7 @@ def checkflow():
 	f = open('result','w')
 	f.write(data)
 	f.close()
-#	print data                                              
+#	print data											  
 	conn2.close()
 	
 	conn3 = httplib.HTTPConnection("a.lzu.edu.cn")
@@ -187,16 +192,16 @@ class Interface:
 	The interface of this.'''
 	
 	ui = '''<ui>
-    <menubar name="MenuBar">
-      <menu action="File">
+	<menubar name="MenuBar">
+	  <menu action="File">
 		<menuitem action="Quit"/>
-      </menu>
-      <menu action="Help">
+	  </menu>
+	  <menu action="Help">
 		<menuitem action="About"/>
 		<menuitem action="Usage"/>
-      </menu>
-    </menubar>
-    </ui>'''
+	  </menu>
+	</menubar>
+	</ui>'''
 	
 	def login(self, widget, data=None):
 		#print 'login'
@@ -232,23 +237,25 @@ class Interface:
 		about.set_program_name("lzuauto")
 		about.set_version("1.0")
 		about.set_copyright("(c) ysjdxcn & Kder")
-		about.set_license('GPLv3')
+		about.set_license('GNU General Public License v3')
 #		about.set_wrap_license(1)
-		about.set_authors(['ysjdxcn','Kder'])
+		about.set_authors(['ysjdxcn <ysjdxcn (#) gmail dot com>','Kder <kderlin (#) gmail dot com>'])
 		about.set_comments("自动登录兰大上网认证系统\n\n欢迎使用此工具，如果您有任何意见或者建议\n请访问项目主页")
 		about.set_website("http://code.google.com/p/lzuauto/")
 		about.set_website_label("项目主页：http://lzuauto.googlecode.com")
 #		about.set_logo(gtk.gdk.pixbuf_new_from_file("code.jpg"))
 		about.run()
 		about.destroy()
-    
+	
 	def Usage(self, widget):
 		dialog = gtk.Dialog('用法', None, gtk.DIALOG_DESTROY_WITH_PARENT, (gtk.STOCK_OK, gtk.RESPONSE_OK))
-		label = gtk.Label()
 		data = "%s" % __doc__
-		label.set_markup(data)
-		dialog.vbox.pack_start(label)
-		label.show()
+		buffer = gtk.TextBuffer()
+		buffer.set_text(data)
+		textview = gtk.TextView(buffer)
+		textview.set_editable(False)
+		dialog.vbox.pack_start(textview)
+		textview.show()
 		dialog.run()
 		dialog.destroy()
 		
@@ -268,15 +275,15 @@ class Interface:
 		actiongroup = gtk.ActionGroup('UIManagerExample')
 		self.actiongroup = actiongroup
 		actiongroup.add_actions([('Quit', gtk.STOCK_QUIT, '退出(_Q)', None,
-		                          '退出', self.DestroyAll),
-		                          ('About', gtk.STOCK_ABOUT, '关于(_A)', None,
-		                          '关于', self.About),
-		                          ('Usage', gtk.STOCK_INFO, '用法(_U)', None,
-		                          '用法', self.Usage),
-		                         ('File', gtk.STOCK_FILE, '文件(_F)'),
-		                         ('Help', gtk.STOCK_HELP, '帮助(_H)'),
-		                         
-		                         ])
+								  '退出', self.DestroyAll),
+								  ('About', gtk.STOCK_ABOUT, '关于(_A)', None,
+								  '关于', self.About),
+								  ('Usage', gtk.STOCK_INFO, '用法(_U)', None,
+								  '用法', self.Usage),
+								 ('File', gtk.STOCK_FILE, '文件(_F)'),
+								 ('Help', gtk.STOCK_HELP, '帮助(_H)'),
+								 
+								 ])
 		actiongroup.get_action('Quit').set_property('short-label', '_Quit')
 
 		uimanager.insert_action_group(actiongroup, 0)
