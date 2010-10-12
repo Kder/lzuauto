@@ -2,7 +2,7 @@
 #-*- coding=utf-8 -*-
 
 '''
-lzuauto - 自动登录兰大上网认证系统。
+lzuauto - 兰大上网认证系统自动登录工具。
 	
 主要功能
 	
@@ -235,12 +235,12 @@ class Interface:
 	def About(self, widget):
 		about = gtk.AboutDialog()
 		about.set_program_name("lzuauto")
-		about.set_version("1.0")
+		about.set_version(__version__)
 		about.set_copyright("(c) ysjdxcn & Kder")
 		about.set_license('GNU General Public License v3')
 #		about.set_wrap_license(1)
 		about.set_authors(['ysjdxcn <ysjdxcn (#) gmail dot com>','Kder <kderlin (#) gmail dot com>'])
-		about.set_comments("自动登录兰大上网认证系统\n\n欢迎使用此工具，如果您有任何意见或者建议\n请访问项目主页")
+		about.set_comments("兰大上网认证系统自动登录工具\n欢迎使用此工具，如果您有任何意见或者建议，请访问项目主页")
 		about.set_website("http://code.google.com/p/lzuauto/")
 		about.set_website_label("项目主页：http://lzuauto.googlecode.com")
 #		about.set_logo(gtk.gdk.pixbuf_new_from_file("code.jpg"))
