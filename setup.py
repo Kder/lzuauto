@@ -3,11 +3,12 @@
 from distutils.core import setup
 import py2exe
 import sys
+import main
 
 window_dict = {"script": "main.pyw",
 #"icon_resources": [(0,'bialix.ico')],
 "name": "lzuauto",
-"version": "1.0",
+"version": main.__version__,
 "description": u"兰大上网认证系统客户端",
 "author": ['ysjdxcn','Kder'],
 "copyright": 'Copyright 2010 ysjdxcn, Kder',

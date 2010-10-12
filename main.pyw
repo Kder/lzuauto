@@ -3,19 +3,19 @@
 
 '''
 lzuauto - 自动登录兰大上网认证系统。
-
+	
 主要功能
-
+	
 	一键登录/退出、流量查询（支持验证码识别）
-
+	
 使用方法
-
+	
 	解压后，修改conf.txt，把自己的用户名密码填入。 运行 main.pyw 就会出来主界面。
-
+	
 系统要求
-
+	
 	Linux下面需要的依赖：
-
+	
 		python(标准发行版里面的版本都应该支持，理论上不支持python3.0且未测试)
 		pygtk
 		python-imaging(PIL库)
@@ -23,7 +23,7 @@ lzuauto - 自动登录兰大上网认证系统。
 		各大发行版的源中应该都有上面的包，在Arch Linux和Gentoo Linux下测试通过。
 		
 	Windows下需要的依赖：
-
+	
 		python-2.5.4.msi
 		PIL-1.1.7.win32-py2.5.exe
 		pycairo-1.4.12-2.win32-py2.5.exe
@@ -31,7 +31,7 @@ lzuauto - 自动登录兰大上网认证系统。
 		pygtk-2.12.1-1.win32-py2.5.exe
 		
 	以上软件请到分别下列地址下载：
-
+	
 		http://www.python.org
 		http://www.pythonware.com/products/pil/
 		http://ftp.gnome.org/pub/GNOME/binaries/win32/pygtk/
@@ -42,7 +42,7 @@ lzuauto - 自动登录兰大上网认证系统。
 __author__= 'ysjdxcn'
 __copyright__ = 'Copyright 2010 ysjdxcn & Kder'
 __credits__ = ['ysjdxcn','Kder']
-__version__ = '1.0.0'
+__version__ = '1.0.2'
 __date__ = '2010-10-11'
 __maintainer__ = ['ysjdxcn','Kder']
 __email__ = ['ysjdxcn (#) gmail dot com', 'kderlin (#) gmail dot com']
@@ -54,7 +54,7 @@ __projecturl__ = 'http://code.google.com/p/lzuauto/'
 
 from pytesser import *
 import urllib, httplib, time, re, sys
-
+import pango
 import os
 
 os.sys.path.append('.')
@@ -255,6 +255,7 @@ class Interface:
 		textview = gtk.TextView(buffer)
 		textview.set_editable(False)
 		dialog.vbox.pack_start(textview)
+#		textview.modify_font(pango.FontDescription("sans 10"))
 		textview.show()
 		dialog.run()
 		dialog.destroy()
@@ -264,10 +265,12 @@ class Interface:
 		win.connect('destroy', lambda wid: gtk.main_quit())
 		win.connect('delete_event', lambda a1,a2:gtk.main_quit())
 		win.set_title('兰州大学校园网工具')
-		win.set_size_request(200, 120)
+		win.set_size_request(200, 100)
 		win.set_position(gtk.WIN_POS_CENTER)
 
 		main_vbox = gtk.VBox(False, 0)
+		main_hbox1 = gtk.HBox(False, 0)
+		main_hbox2 = gtk.HBox(False, 0)
 
 		uimanager = gtk.UIManager()
 		accelgroup = uimanager.get_accel_group()
@@ -291,25 +294,41 @@ class Interface:
 		menubar = uimanager.get_widget('/MenuBar')
 		main_vbox.pack_start(menubar, False)
 
+		image = []
+		stocks = [gtk.STOCK_CONNECT, gtk.STOCK_DISCONNECT, gtk.STOCK_INFO, gtk.STOCK_QUIT]
+		button = []
+		button_label = ["登录外网", "退出外网", "查询流量", "退出程序"]
+		actions = [self.login, self.logout, self.checkflow, self.DestroyAll]
+		for i in range(4):
+			image.append(gtk.Image())
+			button.append(gtk.Button(button_label[i]))
+			button[i].connect("clicked", actions[i], button_label[i])
+			image[i].set_from_stock(stocks[i], gtk.ICON_SIZE_BUTTON)
+			button[i].set_image(image[i])
 
-		button1 = gtk.Button("登录外网")
-		button1.connect("clicked", self.login, "登录")
+#		main_vbox.pack_start(button1, True, True, 0)
+#		main_vbox.pack_start(button2, True, True, 3)
+#		main_vbox.pack_start(button3, True, True, 0)
+#		main_vbox.pack_start(button4, True, True, 0)
 
-		button2 = gtk.Button("退出外网")
-		button2.connect("clicked", self.logout, "登出")
-
-		button3 = gtk.Button("查询流量")
-		button3.connect("clicked", self.checkflow, "查询流量")
+		main_hbox1.pack_start(button[0], True, True, 3)
+		main_hbox1.pack_start(button[2], True, True, 3)
+		main_hbox2.pack_start(button[1], True, True, 3)
+		main_hbox2.pack_start(button[3], True, True, 3)
 		
-		button4 = gtk.Button("退出程序")
-		button4.connect("clicked", self.DestroyAll)
-
-		main_vbox.pack_start(button1, True, True, 0)
-		main_vbox.pack_start(button2, True, True, 0)
-		main_vbox.pack_start(button3, True, True, 0)
-		main_vbox.pack_start(button4, True, True, 0)
+		main_vbox.pack_start(main_hbox1, True, True, 3)
+		main_vbox.pack_start(main_hbox2, True, True, 3)
+		
+#		table = gtk.Table(2, 2, True)
+#		table.set_size_request(190, 110)
+#		table.attach(button1,0,1,0,1,gtk.FILL, gtk.FILL, 0, 0)
+#		table.attach(button2,0,1,1,2,gtk.FILL, gtk.FILL, 0, 0)
+#		table.attach(button3,1,2,0,1,gtk.FILL, gtk.FILL, 0, 0)
+#		table.attach(button4,1,2,1,2,gtk.FILL, gtk.FILL, 0, 0)
+#		win.add(table)
 		
 		win.add(main_vbox)
+		win.modify_font(pango.FontDescription("sans 9"))
 		win.show_all()
 
 
