@@ -10,7 +10,7 @@ lzuauto - 兰大上网认证系统自动登录工具。
 	
 使用方法
 	
-	解压后，修改conf.txt，把自己的用户名密码填入。 运行 main.pyw 就会出来主界面。
+	解压后，修改conf.txt，把自己的用户名密码填入。 运行 main.exe或main.pyw 就会出来主界面。
 	
 系统要求
 	
@@ -225,6 +225,7 @@ class Interface:
 	
 	def Dialog(self, widget, data=None):
 		dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_INFO, gtk.BUTTONS_NONE, data)
+		dialog.set_position(gtk.WIN_POS_CENTER)
 		dialog.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
 		dialog.run()
 		dialog.destroy()
@@ -244,6 +245,7 @@ class Interface:
 		about.set_website("http://code.google.com/p/lzuauto/")
 		about.set_website_label("项目主页：http://lzuauto.googlecode.com")
 #		about.set_logo(gtk.gdk.pixbuf_new_from_file("code.jpg"))
+		about.set_position(gtk.WIN_POS_CENTER)
 		about.run()
 		about.destroy()
 	
