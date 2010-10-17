@@ -37,13 +37,14 @@ lzuauto - 兰大上网认证系统自动登录工具。
 		http://ftp.gnome.org/pub/GNOME/binaries/win32/pygtk/
 		http://ftp.gnome.org/pub/GNOME/binaries/win32/pycairo/
 		http://ftp.gnome.org/pub/GNOME/binaries/win32/pygobject/
+		
 '''
 
 __author__= 'ysjdxcn'
 __copyright__ = 'Copyright 2010 ysjdxcn & Kder'
 __credits__ = ['ysjdxcn','Kder']
-__version__ = '1.0.2'
-__date__ = '2010-10-11'
+__version__ = '1.0.3'
+__date__ = '2010-10-17'
 __maintainer__ = ['ysjdxcn','Kder']
 __email__ = ['ysjdxcn (#) gmail dot com', 'kderlin (#) gmail dot com']
 __url__ = ['http://ranhouzenyang.com/', 'http://www.kder.info']
@@ -57,10 +58,6 @@ import urllib, httplib, time, re, sys
 import pango
 import os
 
-os.sys.path.append('.')
-os.sys.path.append('./glib')
-os.sys.path.append('./gtk')
-os.sys.path.append('./gobject')
 
 try:
 	import pygtk

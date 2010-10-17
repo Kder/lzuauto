@@ -5,6 +5,9 @@ import py2exe
 import sys
 import main
 
+if len(sys.argv) == 1:
+    sys.argv.append('py2exe')
+
 window_dict = {"script": "main.pyw",
 #"icon_resources": [(0,'bialix.ico')],
 "name": "lzuauto",
@@ -25,8 +28,9 @@ setup(name = 'lzuauto',
                             'compressed': 1,
                             'includes':['atk','dsextras','cairo','gio','pango','pangocairo'],
                             'excludes' : ['_ssl', '_hashlib', 'doctest', 'pdb', 'unittest', 'difflib',
-                'pyreadline', 'logging', 'email', 'ctypes', 'bz2',
-                'inspect', 'pickle','unicodedata'],
+                            'pyreadline', 'logging', 'email', 'ctypes', 'bz2', 'distutils', 'codegen',
+                            'inspect', 'pickle','unicodedata'],
+                            #'ascii' : True,
                             #'dll_excludes' : ['msvcr71.dll'],
                             'dist_dir':'lzuauto',
                             }
