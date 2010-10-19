@@ -77,7 +77,7 @@ def login():
     #print data
     result = re.findall(option, data)
     if len(result)>0:
-        return re.findall(option,data)[0].split('\"')[1].decode('gb2312')
+        return result[0].split('\"')[1].decode('gb2312')
     else :
         return 1
 
@@ -134,7 +134,7 @@ def checkflow():
     f = open('result','w')
     f.write(data)
     f.close()
-#    print data                                              
+#    print data            
     conn2.close()
     
     conn3 = httplib.HTTPConnection("a.lzu.edu.cn")
@@ -152,11 +152,11 @@ def checkflow():
     mb = re.findall(option1,data)
     hour = re.findall(option2,data)
     if len(mb)>0:
-        global MB, HOUR
         MB = mb[0].split('&nbsp')[0][1:]
         HOUR = hour[0].split('&nbsp')[0]
     else :
         checkflow()
+    return MB, HOUR
 
 def checkstatus():
     pass
@@ -168,47 +168,50 @@ import tkMessageBox
 
 class Application(Tkinter.Frame):
 
-    def login(self, data=None):
-        #print 'login'
+    def login(self):
         result = login()
-        if result == 1 or '0.00' in result:
-            self.Dialog(None, "登录成功")
-        else :
-            self.Dialog(None, result)
+        if result == 1 or u'可用流量' in result:
+            self.Dialog('登录成功', u"登录成功^_^%s" % result)
+        else:
+            self.Dialog('错误', result, 'error')
+#        self.Dialog(None, data=result)
     
-    def logout(self, data=None):
+    def logout(self):
         #print 'logout'
         if logout():
-            self.Dialog(None, data='您已经成功退出:-)\n')
+            self.Dialog(None, '您已经成功退出:-)\n')
         else :
             self.logout
 
-    def checkflow(self, data=None):
+    def checkflow(self):
         #print 'checkflow'
-        checkflow()
-        self.Dialog(None, data='您本月已经使用的流量为 %s MB\n您本月已经上网 %s 小时' % (MB, HOUR))
+        self.Dialog(None, '您本月已经使用的流量为 %s MB\n您本月已经上网 %s 小时' % checkflow())
     
-    def Dialog(self, title=None, data=None):
-        tkMessageBox.showinfo(title, data, icon='info')
+    def Dialog(self, title=None, data=None, icon='info'):
+        tkMessageBox.showinfo(title, data, icon=icon)
         
     def About(self):
-        self.Dialog('关于', data="lzuauto %s\n 作者 ysjdxcn & Kder \n 项目主页 http://code.google.com/p/lzuauto/ \n License : GPLv3" % __version__)
+        self.Dialog('关于', "lzuauto %s\n作者 ysjdxcn & Kder\n 项目主页 http://code.google.com/p/lzuauto/ \nLicense : GPLv3" % __version__)
         
     def Usage(self):
         textView.view_text(self, '用法', __doc__)
 
     def createWidgets(self):
         self.button = []
-        button_label = ["登录外网", "退出外网", "查询流量", "退出程序"]
-        actions = [self.login, self.logout, self.checkflow, self.quit]
+        button_label = ["登录外网", "查询流量", "退出外网", "退出程序"]
+        actions = [self.login, self.checkflow, self.logout, self.quit]
         # actions = [self.say_hi, self.say_hi, self.say_hi, self.say_hi]
         
         for i in range(4):
             self.button.append(Tkinter.Button(self))
             self.button[i]["text"] = button_label[i]
             self.button[i]["command"] = actions[i]
-            self.button[i].pack({"side": "left"})
-            self.button[i].pack({'expand' : 1})
+#            self.button[i].pack({"side": "left", 'expand' : 1, 'fill' : 'both', 'padx' : 5, 'pady' : 5 })
+        
+        self.button[0].pack({"side": "left", 'expand' : 1, 'fill' : 'both', 'padx' : 5, 'pady' : 5 })
+        self.button[1].pack({"side": "left", 'expand' : 1, 'fill' : 'both', 'padx' : 5, 'pady' : 5 })
+        self.button[2].pack({"side": "left", 'expand' : 1, 'fill' : 'both', 'padx' : 5, 'pady' : 5 })
+        self.button[3].pack({"side": "left", 'expand' : 1, 'fill' : 'both', 'padx' : 5, 'pady' : 5 })
             
         top = self.winfo_toplevel()
         self.menuBar = Tkinter.Menu(top)
@@ -233,8 +236,6 @@ class Application(Tkinter.Frame):
         Tkinter.Frame.__init__(self, master)
         self.pack()
         self.createWidgets()
-
-
 
         
 if __name__ == "__main__":
