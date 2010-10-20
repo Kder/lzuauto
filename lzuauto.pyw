@@ -201,6 +201,7 @@ class Application(Tkinter.Frame):
         self.subMenu2.add_command(label="关于(A)", command=self.About, accelerator='Ctrl+A', underline =3)
         self.subMenu2.add_command(label="用法(U)", command=self.Usage, accelerator='F1', underline =3)
 
+        buttons = list()
         button_label = ["登录外网", "查询流量", "退出外网", "退出程序"]
         actions = [self.login, self.checkflow, self.logout, self.quit]
         idx = 0
@@ -208,11 +209,13 @@ class Application(Tkinter.Frame):
             setattr(self, 'of%d' % bdw, Tkinter.Frame(self, borderwidth=0))
             Tkinter.Label(getattr(self, 'of%d' % bdw), text=None).pack(side=Tkinter.LEFT)
             for i in range(2):
-                Tkinter.Button(getattr(self, 'of%d' % bdw), text=button_label[idx], width=10,
-                       command=actions[idx]).pack(side=Tkinter.LEFT, padx=7, pady=7)
+                buttons.append(Tkinter.Button(getattr(self, 'of%d' % bdw), text=button_label[idx], width=10,
+                       command=actions[idx]))
+                buttons[idx].pack(side=Tkinter.LEFT, padx=7, pady=7)
                 idx += 1
             getattr(self, 'of%d' % bdw).pack()
-
+        buttons[0].focus_set()
+            
     def Quit(self, event=None):
         self.destroy()
         root.destroy()
