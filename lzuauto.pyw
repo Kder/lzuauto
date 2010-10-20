@@ -51,6 +51,7 @@ import os
 import urllib, httplib, time, re, sys
 from pytesser import *
 from idlelib import textView
+from StringIO import StringIO
 
 
 ########################################################################
@@ -108,11 +109,8 @@ def checkflow():
     response1 = conn1.getresponse()
     #print response1.getheaders()
     data = response1.read()
-    #print data
-    img = open('code.jpg','wb')
-    img.write(data)
-    img.close()
-    image = Image.open('code.jpg')
+    f = StringIO(data)
+    image = Image.open(f)
     s = image_to_string(image)[0:4]
     #print s[0:4]
     conn1.close()
@@ -124,9 +122,9 @@ def checkflow():
     response2 = conn2.getresponse()
     #print response2.getheaders()
     data = response2.read()
-    f = open('result','w')
-    f.write(data)
-    f.close()
+#    f = open('result','w')
+#    f.write(data)
+#    f.close()
 #    print data            
     conn2.close()
     
@@ -147,8 +145,9 @@ def checkflow():
     if len(mb)>0:
         MB = mb[0].split('&nbsp')[0][1:]
         HOUR = hour[0].split('&nbsp')[0]
-    else :
+    else:
         checkflow()
+    print MB, HOUR
     return MB, HOUR
 
 def checkstatus():
