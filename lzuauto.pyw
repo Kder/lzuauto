@@ -19,6 +19,7 @@ lzuauto - 兰大上网认证系统自动登录工具。
         python(标准发行版里面的版本都应该支持，理论上不支持python3.0且未测试)
         python-imaging(PIL库)
         tesseract(一个ocr工具，项目主页 http://code.google.com/p/tesseract-ocr/ ）
+        tcl和tk
         各大发行版的源中应该都有上面的包，在Arch Linux和Gentoo Linux下测试通过。
         
     Windows下需要的依赖：
@@ -36,8 +37,8 @@ lzuauto - 兰大上网认证系统自动登录工具。
 __author__= 'ysjdxcn'
 __copyright__ = 'Copyright 2010 ysjdxcn & Kder'
 __credits__ = ['ysjdxcn','Kder']
-__version__ = '1.0.3'
-__date__ = '2010-10-17'
+__version__ = '1.0.4'
+__date__ = '2010-10-20'
 __maintainer__ = ['ysjdxcn','Kder']
 __email__ = ['ysjdxcn (#) gmail dot com', 'kderlin (#) gmail dot com']
 __url__ = ['http://ranhouzenyang.com/', 'http://www.kder.info']
@@ -52,15 +53,7 @@ from pytesser import *
 from idlelib import textView
 
 
-################################################################################
-
-try:
-    f = open('conf.txt')
-    userid, passwd = f.readline().split()
-    f.close()
-except:
-    print 'Error: Cannot open conf.txt, please make sure that the file exists and is accessible.'
-    sys.exit(3)
+########################################################################
 
 option = 'alert(.*?);'
 option1 = '<td bgcolor=\"FFFBF0\" align=\"center\" colspan=5>(.*?)MB'
@@ -171,79 +164,85 @@ class Application(Tkinter.Frame):
     def login(self):
         result = login()
         if result == 1 or u'可用流量' in result:
-            self.Dialog('登录成功', u"登录成功^_^%s" % result)
+            self.Dialog('登录成功', u"登录成功^_^ %s" % result)
         else:
             self.Dialog('错误', result, 'error')
-#        self.Dialog(None, data=result)
-    
+ 
     def logout(self):
-        #print 'logout'
         if logout():
-            self.Dialog(None, '您已经成功退出:-)\n')
+            self.Dialog("退出外网", '您已经成功退出:-)\n')
         else :
             self.logout
 
     def checkflow(self):
-        #print 'checkflow'
-        self.Dialog(None, '您本月已经使用的流量为 %s MB\n您本月已经上网 %s 小时' % checkflow())
+        self.Dialog("流量查询", '您本月已经使用的流量为 %s MB\n您本月已经上网 %s 小时' % checkflow())
     
     def Dialog(self, title=None, data=None, icon='info'):
         tkMessageBox.showinfo(title, data, icon=icon)
         
-    def About(self):
-        self.Dialog('关于', "lzuauto %s\n作者 ysjdxcn & Kder\n 项目主页 http://code.google.com/p/lzuauto/ \nLicense : GPLv3" % __version__)
+    def About(self, event=None):
+        self.Dialog('关于', "lzuauto %s\n作者： ysjdxcn & Kder\n项目主页： http://code.google.com/p/lzuauto/ \nLicense : GPLv3" % __version__)
         
-    def Usage(self):
+    def Usage(self, event=None):
         textView.view_text(self, '用法', __doc__)
 
     def createWidgets(self):
-        self.button = []
+
+        # top = self.winfo_toplevel()
+        # self.menuBar = Tkinter.Menu(top)
+        # top["menu"] = self.menuBar
+        self.menuBar = Tkinter.Menu(self)
+        self.master["menu"] = self.menuBar
+        self.subMenu1 = Tkinter.Menu(self.menuBar, tearoff=0)
+        self.subMenu2 = Tkinter.Menu(self.menuBar, tearoff=0)
+        self.menuBar.add_cascade(label="文件(F)", menu=self.subMenu1, underline =3)
+        self.subMenu1.add_command(label="退出(X)", command=self.quit, accelerator='Ctrl+Q', underline =3)
+        self.menuBar.add_cascade(label="帮助(H)", menu=self.subMenu2, underline =3)
+        self.subMenu2.add_command(label="关于(A)", command=self.About, accelerator='Ctrl+A', underline =3)
+        self.subMenu2.add_command(label="用法(U)", command=self.Usage, accelerator='F1', underline =3)
+
         button_label = ["登录外网", "查询流量", "退出外网", "退出程序"]
         actions = [self.login, self.checkflow, self.logout, self.quit]
-        # actions = [self.say_hi, self.say_hi, self.say_hi, self.say_hi]
-        
-        for i in range(4):
-            self.button.append(Tkinter.Button(self))
-            self.button[i]["text"] = button_label[i]
-            self.button[i]["command"] = actions[i]
-#            self.button[i].pack({"side": "left", 'expand' : 1, 'fill' : 'both', 'padx' : 5, 'pady' : 5 })
-        
-        self.button[0].pack({"side": "left", 'expand' : 1, 'fill' : 'both', 'padx' : 5, 'pady' : 5 })
-        self.button[1].pack({"side": "left", 'expand' : 1, 'fill' : 'both', 'padx' : 5, 'pady' : 5 })
-        self.button[2].pack({"side": "left", 'expand' : 1, 'fill' : 'both', 'padx' : 5, 'pady' : 5 })
-        self.button[3].pack({"side": "left", 'expand' : 1, 'fill' : 'both', 'padx' : 5, 'pady' : 5 })
-            
-        top = self.winfo_toplevel()
-        self.menuBar = Tkinter.Menu(top)
-        top["menu"] = self.menuBar
+        idx = 0
+        for bdw in range(2):
+            setattr(self, 'of%d' % bdw, Tkinter.Frame(self, borderwidth=0))
+            Tkinter.Label(getattr(self, 'of%d' % bdw), text=None).pack(side=Tkinter.LEFT)
+            for i in range(2):
+                Tkinter.Button(getattr(self, 'of%d' % bdw), text=button_label[idx], width=10,
+                       command=actions[idx]).pack(side=Tkinter.LEFT, padx=7, pady=7)
+                idx += 1
+            getattr(self, 'of%d' % bdw).pack()
 
-        self.subMenu1 = Tkinter.Menu(self.menuBar)
-        self.subMenu2 = Tkinter.Menu(self.menuBar)
-        self.menuBar.add_cascade(label="文件", menu=self.subMenu1)
-        self.subMenu1.add_command(label="退出", command=self.quit)
-        self.menuBar.add_cascade(label="帮助", menu=self.subMenu2)
-        self.subMenu2.add_command(label="关于", command=self.About)
-        self.subMenu2.add_command(label="用法", command=self.Usage)
+    def Quit(self, event=None):
+        self.destroy()
+        root.destroy()
         
-        # self.QUIT = Button(self)
-        # self.QUIT["text"] = "QUIT"
-        # self.QUIT["fg"]   = "red"
-        # self.QUIT["command"] =  self.quit
-
-        # self.QUIT.pack({"side": "left"})      
-        
-    def __init__(self, master=None):
+    def __init__(self, master):
+        global userid, passwd
         Tkinter.Frame.__init__(self, master)
         self.pack()
         self.createWidgets()
-
+        self.master.title('兰大上网认证系统自动登录工具')
+        # root.bind('<Escape>', self.Ok)
+        root.bind('<Control-q>', self.Quit)
+        root.bind('<F1>', self.Usage)
+        root.bind('<Control-a>', self.About)
+        try:
+            f = open('conf.txt')
+            userid, passwd = f.readline().split()
+            f.close()
+        except:
+            self.Dialog('错误', '无法打开配置文件conf.txt，请确认文件存在并有访问权限', 'error')
+            sys.exit(3)
+        # self.transient(parent)
+        # self.grab_set()
+        # self.protocol("WM_DELETE_WINDOW", self.Ok)
+        # self.wait_window()
         
 if __name__ == "__main__":
     root = Tkinter.Tk()
     app = Application(master=root)
-    app.master.title('兰大上网认证系统自动登录工具')
-    
     app.mainloop()
-    root.destroy()
+    # root.destroy()
 
 #vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4
