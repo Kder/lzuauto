@@ -34,129 +34,17 @@ lzuauto - 兰大上网认证系统自动登录工具。
         
 '''
 
-__author__= 'ysjdxcn'
-__copyright__ = 'Copyright 2010 ysjdxcn & Kder'
-__credits__ = ['ysjdxcn','Kder']
-__version__ = '1.0.4'
-__date__ = '2010-10-20'
-__maintainer__ = ['ysjdxcn','Kder']
-__email__ = ['ysjdxcn (#) gmail dot com', 'kderlin (#) gmail dot com']
-__url__ = ['http://ranhouzenyang.com/', 'http://www.kder.info']
-__license__ = 'GNU General Public License v3'
-__status__ = 'Release'
-__projecturl__ = 'http://code.google.com/p/lzuauto/'
 
 
-import os
-import urllib, httplib, time, re, sys
-from pytesser import *
-from idlelib import textView
-from StringIO import StringIO
-
-
-########################################################################
-
-option = 'alert(.*?);'
-option1 = '<td bgcolor=\"FFFBF0\" align=\"center\" colspan=5>(.*?)MB'
-option2 = '<td bgcolor=\"FFFBF0\" align=\"center\" colspan=5>(.*?)Hours'
-
-def login():
-    params = urllib.urlencode( {'userid':userid,'password':passwd,'serivce':'intenet','chap':'0','random':'internet','x':'25','y':'12'} )
-    headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
-    conn = httplib.HTTPConnection( "1.1.1.1" )  
-    conn.request( "POST", "/passwd.magi", params, headers )
-    response = conn.getresponse()
-    data = response.read() 
-    conn.close()
-    #print data
-    result = re.findall(option, data)
-    if len(result)>0:
-        return result[0].split('\"')[1].decode('gb2312')
-    else :
-        return 1
-
-def logout():
-    params = urllib.urlencode( {'imageField.x':'44','imageField.y':'27'} )
-    headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
-    conn = httplib.HTTPConnection( "1.1.1.1" )  
-    conn.request( "POST", "/userout.magi", params, headers )
-    response = conn.getresponse()
-    conn.close()
-    if response.status == 200:
-        return 1
-    else :
-        return 0
-
-def checkflow():
-    headers = {"User-Agetn":"Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.2.10) Gecko/20100916 Firefox/3.6.10","Content-type": "application/x-www-form-urlencoded", "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8","Keep-Alive":"115","Connection":"keep-alive"}
-    conn = httplib.HTTPConnection( "a.lzu.edu.cn" )  
-    conn.request( 'GET', '/', headers = headers )
-    response = conn.getresponse()
-    #print response.getheaders()
-    cookie = response.getheader('set-cookie').split()[0]
-    temp = {'Cookie':cookie}
-    headers.update(temp)
-    conn.close()
-
-    conn0 = httplib.HTTPConnection( "a.lzu.edu.cn" )  
-    conn0.request( 'GET', '/selfLogon.do', headers = headers )
-    response0 = conn0.getresponse()
-    #print response0.getheaders()
-    conn0.close()
-
-    conn1 = httplib.HTTPConnection("a.lzu.edu.cn")
-    conn1.request( 'GET', '/servlet/AuthenCodeImage', headers = headers)
-    response1 = conn1.getresponse()
-    #print response1.getheaders()
-    data = response1.read()
-    f = StringIO(data)
-    image = Image.open(f)
-    s = image_to_string(image)[0:4]
-    #print s[0:4]
-    conn1.close()
-
-    conn2 = httplib.HTTPConnection("a.lzu.edu.cn")
-    params = urllib.urlencode( {'user_id':userid,'passwd':passwd,'validateCode':s} )
-    #print params
-    conn2.request( 'POST', '/selfLogonAction.do', params, headers = headers)
-    response2 = conn2.getresponse()
-    #print response2.getheaders()
-    data = response2.read()
-#    f = open('result','w')
-#    f.write(data)
-#    f.close()
-#    print data            
-    conn2.close()
-    
-    conn3 = httplib.HTTPConnection("a.lzu.edu.cn")
-    conn3.request( 'GET', '/selfIndexAction.do',headers = headers)
-    response3 = conn3.getresponse()
-    data = response3.read()
-#    print data
-    conn3.close()
-
-    conn4 = httplib.HTTPConnection("a.lzu.edu.cn")
-    conn4.request( 'GET', '/userQueryAction.do',headers = headers)
-    response4 = conn4.getresponse()
-    data = response4.read()
-    conn4.close()
-    mb = re.findall(option1,data)
-    hour = re.findall(option2,data)
-    if len(mb)>0:
-        MB = mb[0].split('&nbsp')[0][1:]
-        HOUR = hour[0].split('&nbsp')[0]
-    else:
-        checkflow()
-    print MB, HOUR
-    return MB, HOUR
-
-def checkstatus():
-    pass
-
-################################################################################
+import py_compile
+py_compile.compile('main.pyw','main.pyc')
+from main import *
 
 import Tkinter
 import tkMessageBox 
+from idlelib import textView
+
+__version__ = '1.1.0'
 
 class Application(Tkinter.Frame):
 
@@ -174,8 +62,15 @@ class Application(Tkinter.Frame):
             self.logout
 
     def checkflow(self):
-        self.Dialog("流量查询", '您本月已经使用的流量为 %s MB\n您本月已经上网 %s 小时' % checkflow())
-    
+        flow = checkflow()
+        if flow == 1:
+            self.Dialog('错误', '请检查conf.txt中的邮箱和密码是否正确', 'error')
+            sys.exit(4)
+        elif flow == None:
+            self.Dialog('错误', '发生错误，请稍候再试', 'error')
+        else:
+            self.Dialog('流量查询', '您本月已经使用的流量为 %s MB\n您本月已经上网 %s 小时' % flow)
+
     def Dialog(self, title=None, data=None, icon='info'):
         tkMessageBox.showinfo(title, data, icon=icon)
         
@@ -220,7 +115,6 @@ class Application(Tkinter.Frame):
         root.destroy()
         
     def __init__(self, master):
-        global userid, passwd
         Tkinter.Frame.__init__(self, master)
         self.pack()
         self.createWidgets()
@@ -229,13 +123,6 @@ class Application(Tkinter.Frame):
         root.bind('<Control-q>', self.Quit)
         root.bind('<F1>', self.Usage)
         root.bind('<Control-a>', self.About)
-        try:
-            f = open('conf.txt')
-            userid, passwd = f.readline().split()
-            f.close()
-        except:
-            self.Dialog('错误', '无法打开配置文件conf.txt，请确认文件存在并有访问权限', 'error')
-            sys.exit(3)
         # self.transient(parent)
         # self.grab_set()
         # self.protocol("WM_DELETE_WINDOW", self.Ok)
@@ -244,6 +131,10 @@ class Application(Tkinter.Frame):
 if __name__ == "__main__":
     root = Tkinter.Tk()
     app = Application(master=root)
+    #~ app.Dialog('hi','welcome')
+    if ioerr:
+        app.Dialog('错误', '无法打开配置文件conf.txt，请确认文件存在并有访问权限', 'error')
+        sys.exit(3)
     app.mainloop()
     # root.destroy()
 
