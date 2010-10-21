@@ -44,7 +44,7 @@ py_compile.compile('main.pyw','main.pyc')
 import main
 
 
-rev = "$Revision: 25 $"
+rev = "$Revision$"
 __version__ = '1.1.0' + ('.%s' % rev.split(':')[1][:-1].strip())
 
 

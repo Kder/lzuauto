@@ -43,8 +43,7 @@ lzuauto - 兰大上网认证系统自动登录工具。
 __author__= 'ysjdxcn'
 __copyright__ = 'Copyright 2010 ysjdxcn & Kder'
 __credits__ = ['ysjdxcn','Kder']
-__version__ = '1.1.0'
-__date__ = '2010-10-20'
+
 __maintainer__ = ['ysjdxcn','Kder']
 __email__ = ['ysjdxcn (#) gmail dot com', 'kderlin (#) gmail dot com']
 __url__ = ['http://ranhouzenyang.com/', 'http://www.kder.info']
@@ -52,6 +51,9 @@ __license__ = 'GNU General Public License v3'
 __status__ = 'Release'
 __projecturl__ = 'http://code.google.com/p/lzuauto/'
 
+rev = "$Revision$"
+__version__ = '1.1.0' + ('.%s' % rev.split(':')[1][:-1].strip())
+__date__ = '$Date 2010-10-21 17:36:37 +0800 (Thu, 21 Oct 2010)$'
 
 import os
 import sys
