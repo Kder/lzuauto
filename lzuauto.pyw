@@ -35,36 +35,37 @@ lzuauto - 兰大上网认证系统自动登录工具。
 '''
 
 
-
-import py_compile
-py_compile.compile('main.pyw','main.pyc')
-from main import *
-
 import Tkinter
 import tkMessageBox 
 from idlelib import textView
+import py_compile
+py_compile.compile('main.pyw','main.pyc')
+
+import main
+
 
 __version__ = '1.1.0'
+
 
 class Application(Tkinter.Frame):
 
     def login(self):
-        result = login()
+        result = main.login()
         if result == 1 or u'可用流量' in result:
             self.Dialog('登录成功', u"登录成功^_^ %s" % result)
         else:
             self.Dialog('错误', result, 'error')
  
     def logout(self):
-        if logout():
+        if main.logout():
             self.Dialog("退出外网", '您已经成功退出:-)\n')
         else :
             self.logout
 
     def checkflow(self):
-        flow = checkflow()
-        print flow
-        if type(flow) == type('tuple'):
+        flow = main.checkflow()
+#        print flow
+        if type(flow) == type(tuple()):
             self.Dialog('流量查询', '您本月已经使用的流量为 %s MB\n您本月已经上网 %s 小时' % flow)
         elif flow == 1:
             self.Dialog('错误', '请检查conf.txt中的邮箱和密码是否正确', 'error')
@@ -76,7 +77,7 @@ class Application(Tkinter.Frame):
         tkMessageBox.showinfo(title, data, icon=icon)
         
     def About(self, event=None):
-        self.Dialog('关于', "lzuauto %s\n作者： ysjdxcn & Kder\n项目主页： http://code.google.com/p/lzuauto/ \nLicense : GPLv3" % __version__)
+        self.Dialog('关于', "lzuauto %s\n作者： ysjdxcn & Kder\n项目主页： http://code.google.com/p/lzuauto/ \nLicense : GPLv3" % main.__version__)
         
     def Usage(self, event=None):
         textView.view_text(self, '用法', __doc__)
@@ -133,7 +134,7 @@ if __name__ == "__main__":
     root = Tkinter.Tk()
     app = Application(master=root)
     #~ app.Dialog('hi','welcome')
-    if ioerr:
+    if main.IOERR:
         app.Dialog('错误', '无法打开配置文件conf.txt，请确认文件存在并有访问权限', 'error')
         sys.exit(3)
     app.mainloop()

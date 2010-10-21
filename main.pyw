@@ -53,19 +53,28 @@ __status__ = 'Release'
 __projecturl__ = 'http://code.google.com/p/lzuauto/'
 
 
-import os, sys, subprocess, time
-import urllib, httplib, re
+import os
+import sys
+import subprocess
+import time
+import urllib
+import httplib
+import re
+
 import Image
 
+
 ########################################################################
-chk_count = 0
-ioerr = False
+
+
+CHK_COUNT = 0
+IOERR = False
 try:
     f = open('conf.txt')
     userid, passwd = f.readline().split()
     f.close()
 except:
-    ioerr = True
+    IOERR = True
 option = 'alert(.*?);'
 option1 = '<td bgcolor=\"FFFBF0\" align=\"center\" colspan=5>(.*?)MB'
 option2 = '<td bgcolor=\"FFFBF0\" align=\"center\" colspan=5>(.*?)Hours'
@@ -146,7 +155,6 @@ def checkflow():
     f.close()
 #    sys.exit(7)
     try:
-#        pass
         os.remove('code.bmp')
         os.remove('ocr.txt')
     except:
@@ -180,14 +188,14 @@ def checkflow():
     conn4.close()
     mb = re.findall(option1,data)
     hour = re.findall(option2,data)
-    global chk_count
+    global CHK_COUNT
     if len(mb)>0:
         MB = mb[0].split('&nbsp')[0][1:]
         HOUR = hour[0].split('&nbsp')[0]
 #        print MB,HOUR
         return (MB, HOUR)
-    elif chk_count < 5:
-        chk_count += 1
+    elif CHK_COUNT < 5:
+        CHK_COUNT += 1
         checkflow()
     else:
         return 1
@@ -370,7 +378,7 @@ if __name__ == "__main__":
 
 
     start = Interface()
-    if ioerr:
+    if IOERR:
         start.Dialog('错误', '无法打开配置文件conf.txt，请确认文件存在并有访问权限', icon = gtk.MESSAGE_ERROR)
         sys.exit(3)
     gtk.main()
