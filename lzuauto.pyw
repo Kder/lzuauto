@@ -63,13 +63,14 @@ class Application(Tkinter.Frame):
 
     def checkflow(self):
         flow = checkflow()
-        if flow == 1:
+        print flow
+        if type(flow) == type('tuple'):
+            self.Dialog('流量查询', '您本月已经使用的流量为 %s MB\n您本月已经上网 %s 小时' % flow)
+        elif flow == 1:
             self.Dialog('错误', '请检查conf.txt中的邮箱和密码是否正确', 'error')
             sys.exit(4)
         elif flow == None:
             self.Dialog('错误', '发生错误，请稍候再试', 'error')
-        else:
-            self.Dialog('流量查询', '您本月已经使用的流量为 %s MB\n您本月已经上网 %s 小时' % flow)
 
     def Dialog(self, title=None, data=None, icon='info'):
         tkMessageBox.showinfo(title, data, icon=icon)

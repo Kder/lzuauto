@@ -119,11 +119,21 @@ def checkflow():
     response1 = conn1.getresponse()
     #print response1.getheaders()
     data = response1.read()
-    #~ f = StringIO(data)
-    #~ image = Image.open(f)
+    from StringIO import StringIO
+    f = StringIO(data)
+    image = Image.open(f)
     #~ s = image_to_string(image)[:4]
-    image = Image.fromstring('RGB',(60,20),data,'jpeg','RGB','RGB')#
-    image.save('code.bmp')
+#    image = Image.fromstring('RGB',(60,20),data,'jpeg','RGB','RGB')#
+#    print image.info
+    import ImageEnhance
+#    enhancer = ImageEnhance.Sharpness(image)
+    enhancer = ImageEnhance.Contrast(image)
+#    enhancer = ImageEnhance.Color(image)
+    image = enhancer.enhance(2.0)
+#    for i in range(8):
+#        factor = i / 4.0
+#        enhancer.enhance(factor).show("Sharpness %f" % factor)
+    image.save('code.bmp',format = 'bmp')
     args = ['tesseract code.bmp ocr']
     #~ print os.getcwd(),args
     proc = subprocess.Popen(args, shell=True)
@@ -134,8 +144,10 @@ def checkflow():
     s = f.read().strip()
     print s
     f.close()
+#    sys.exit(7)
     try:
-        #~ os.remove('code.bmp')
+#        pass
+        os.remove('code.bmp')
         os.remove('ocr.txt')
     except:
         pass
@@ -169,11 +181,11 @@ def checkflow():
     mb = re.findall(option1,data)
     hour = re.findall(option2,data)
     global chk_count
-    #~ print chk_count
     if len(mb)>0:
         MB = mb[0].split('&nbsp')[0][1:]
         HOUR = hour[0].split('&nbsp')[0]
-        return MB, HOUR
+#        print MB,HOUR
+        return (MB, HOUR)
     elif chk_count < 5:
         chk_count += 1
         checkflow()
@@ -234,8 +246,8 @@ if __name__ == "__main__":
                 self.logout
 
         def checkflow(self, widget, data=None):
-            #print 'checkflow'
             flow = checkflow()
+            print flow
             if flow == 1:
                 self.Dialog('错误', '请检查conf.txt中的邮箱和密码是否正确', icon = gtk.MESSAGE_ERROR)
                 sys.exit(4)
