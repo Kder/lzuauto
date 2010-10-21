@@ -1,7 +1,4 @@
 main.pyw
-pytesser.py
-errors.py
-util.py
 conf.txt
 tesseract.exe
 tessdata

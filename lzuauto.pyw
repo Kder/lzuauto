@@ -17,21 +17,14 @@ lzuauto - 兰大上网认证系统自动登录工具。
     Linux下面需要的依赖：
     
         python(标准发行版里面的版本都应该支持，理论上不支持python3.0且未测试)
-        python-imaging(PIL库)
-        tesseract(一个ocr工具，项目主页 http://code.google.com/p/tesseract-ocr/ ）
         tcl和tk
+        tesseract(一个ocr工具，项目主页 http://code.google.com/p/tesseract-ocr/ ）
         各大发行版的源中应该都有上面的包，在Arch Linux和Gentoo Linux下测试通过。
         
     Windows下需要的依赖：
     
-        python-2.5.4.msi
-        PIL-1.1.7.win32-py2.5.exe
-        
-    以上软件请到分别下列地址下载：
+        Python2.5以上，下载地址：http://www.python.org
     
-        http://www.python.org
-        http://www.pythonware.com/products/pil/
-        
 '''
 
 
@@ -48,6 +41,7 @@ rev = "$Revision$"
 __version__ = '1.1.0' + ('.%s' % rev.split(':')[1][:-1].strip())
 __date__ = '$Date$'
 __author__= '$Author$'
+
 
 class Application(Tkinter.Frame):
 
