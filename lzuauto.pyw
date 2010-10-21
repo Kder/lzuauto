@@ -46,7 +46,8 @@ import main
 
 rev = "$Revision$"
 __version__ = '1.1.0' + ('.%s' % rev.split(':')[1][:-1].strip())
-
+__date__ = '$Date$'
+__author__= '$Author$'
 
 class Application(Tkinter.Frame):
 

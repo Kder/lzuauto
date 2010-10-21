@@ -53,7 +53,7 @@ __projecturl__ = 'http://code.google.com/p/lzuauto/'
 
 rev = "$Revision$"
 __version__ = '1.1.0' + ('.%s' % rev.split(':')[1][:-1].strip())
-__date__ = '$Date 2010-10-21 17:36:37 +0800 (Thu, 21 Oct 2010)$'
+__date__ = '$Date$'
 
 import os
 import sys
