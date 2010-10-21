@@ -44,8 +44,8 @@ py_compile.compile('main.pyw','main.pyc')
 import main
 
 
-rev = '$Rev$'
-__version__ = '1.1.0'.jion('.%s' % rev.split('$')[2].strip())
+rev = "$Revision: 25 $"
+__version__ = '1.1.0' + ('.%s' % rev.split(':')[1][:-1].strip())
 
 
 class Application(Tkinter.Frame):
