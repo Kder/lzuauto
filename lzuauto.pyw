@@ -44,14 +44,15 @@ py_compile.compile('main.pyw','main.pyc')
 import main
 
 
-__version__ = '1.1.0'
+rev = '$Rev$'
+__version__ = '1.1.0'.jion('.%s' % rev.split('$')[2].strip())
 
 
 class Application(Tkinter.Frame):
 
     def login(self):
         result = main.login()
-        if result == 1 or u'可用流量' in result:
+        if result is 1 or u'可用流量' in result:
             self.Dialog('登录成功', u"登录成功^_^ %s" % result)
         else:
             self.Dialog('错误', result, 'error')
@@ -65,19 +66,19 @@ class Application(Tkinter.Frame):
     def checkflow(self):
         flow = main.checkflow()
 #        print flow
-        if type(flow) == type(tuple()):
+        if type(flow) is type(tuple()):
             self.Dialog('流量查询', '您本月已经使用的流量为 %s MB\n您本月已经上网 %s 小时' % flow)
-        elif flow == 1:
+        elif flow is 1:
             self.Dialog('错误', '请检查conf.txt中的邮箱和密码是否正确', 'error')
             sys.exit(4)
-        elif flow == None:
+        elif flow is None:
             self.Dialog('错误', '发生错误，请稍候再试', 'error')
 
     def Dialog(self, title=None, data=None, icon='info'):
         tkMessageBox.showinfo(title, data, icon=icon)
         
     def About(self, event=None):
-        self.Dialog('关于', "lzuauto %s\n作者： ysjdxcn & Kder\n项目主页： http://code.google.com/p/lzuauto/ \nLicense : GPLv3" % main.__version__)
+        self.Dialog('关于', "lzuauto %s\n作者： ysjdxcn & Kder\n项目主页： http://code.google.com/p/lzuauto/ \nLicense : GPLv3" % __version__)
         
     def Usage(self, event=None):
         textView.view_text(self, '用法', __doc__)

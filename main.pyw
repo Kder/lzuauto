@@ -241,7 +241,7 @@ if __name__ == "__main__":
         def login(self, widget, data=None):
             #print 'login'
             result = login()
-            if result == 1 or u'可用流量' in result:
+            if result is 1 or u'可用流量' in result:
                 self.Dialog("登录成功", result)
             else:
                 self.Dialog('错误', result, icon = gtk.MESSAGE_ERROR)
@@ -256,10 +256,10 @@ if __name__ == "__main__":
         def checkflow(self, widget, data=None):
             flow = checkflow()
             print flow
-            if flow == 1:
+            if flow is 1:
                 self.Dialog('错误', '请检查conf.txt中的邮箱和密码是否正确', icon = gtk.MESSAGE_ERROR)
                 sys.exit(4)
-            elif flow == None:
+            elif flow is None:
                 self.Dialog('错误', '发生错误，请稍候再试', icon = gtk.MESSAGE_ERROR)
             else:
                 self.Dialog('流量查询', '您本月已经使用的流量为 %s MB\n您本月已经上网 %s 小时' % flow)
