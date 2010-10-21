@@ -121,7 +121,8 @@ def ocr(data):
         img_file = open(img_name, 'wb')
         img_file.write(data)
         img_file.close()
-    
+    else:
+        return 9
     #~ s = image_to_string(image)[:4]
 #    image = Image.fromstring('RGB',(60,20),data,'jpeg','RGB','RGB')#
 #    print image.info
@@ -140,7 +141,13 @@ def ocr(data):
 #    image = enhancer.enhance(2.0)
 #    img_name = 'code.bmp'
 #    image.save(img_name,format = 'bmp')
-    
+
+    if os.name == 'posix':
+        try:
+            subprocess.Popen('djpeg -bmp code.jpg > code.bmp', shell=True)
+            img_name = 'code.bmp'
+        except:
+            return 8
     args = ['tesseract %s ocr' % img_name]
     #~ print os.getcwd(),args
     proc = subprocess.Popen(args, shell=True)
@@ -183,7 +190,8 @@ def checkflow():
     data = response1.read()
     conn1.close()
     s = ocr(data)
-    
+    if type(s) is not type(str()):
+        return s
     conn2 = httplib.HTTPConnection("a.lzu.edu.cn")
     params = urllib.urlencode( {'user_id':userid,'passwd':passwd,'validateCode':s} )
     #print params
@@ -209,7 +217,7 @@ def checkflow():
     response4 = conn4.getresponse()
     data = response4.read()
     conn4.close()
-    print data[0]
+#    print data[0]
     mb = re.findall(option1,data)
     hour = re.findall(option2,data)
     global CHK_COUNT
@@ -236,14 +244,14 @@ if __name__ == "__main__":
         import pango
         pygtk.require('2.0')
     except:
-        print 'pygtk 2.0 needed'
+        sys.stdout.write('pygtk 2.0 needed')
         sys.exit(1)
 
     try:
         import gtk
     except Exception as e:
-        print e
-        print 'gtk needed'
+        #print e
+        sys.stdout.write('gtk needed')
         sys.exit(2)
 
 
@@ -266,7 +274,7 @@ if __name__ == "__main__":
         def login(self, widget, data=None):
             #print 'login'
             result = login()
-            if result is 1 or u'可用流量' in result:
+            if result is 1 or 'M)' in result:
                 self.Dialog(TITLE_LOGIN, MSG_LOGIN % result)
             else:
                 self.Dialog(TITLE_ERR, result, icon = gtk.MESSAGE_ERROR)
