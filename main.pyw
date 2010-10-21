@@ -63,14 +63,24 @@ import urllib
 import httplib
 import re
 
-import Image
-
 
 ########################################################################
 
 
 CHK_COUNT = 0
 IOERR = False
+ERR_CONF = '无法打开配置文件conf.txt，请确认文件存在并有访问权限'
+ERR_OCR = '请检查conf.txt中的邮箱和密码是否正确；如果设置正确，请稍候再试一次'
+MSG_FLOW = '您本月已经使用的流量为 %s MB\n您本月已经上网 %s 小时'
+MSG_LOGIN = "登录成功^_^ %s"
+MSG_LOGOUT = '您已经成功退出:-)\n'
+TITLE_LOGIN = '登录成功'
+TITLE_LOGOUT = "退出外网"
+TITLE_ABOUT = '关于'
+TITLE_USAGE = '用法'
+TITLE_ERR = '错误'
+TITLE_FLOW = '流量查询'
+
 try:
     f = open('conf.txt')
     userid, passwd = f.readline().split()
@@ -108,6 +118,49 @@ def logout():
     else :
         return 0
 
+def ocr(data):
+    img_name = 'code.jpg'
+    img_file = open(img_name, 'wb')
+    img_file.write(data)
+    img_file.close()
+    
+    #~ s = image_to_string(image)[:4]
+#    image = Image.fromstring('RGB',(60,20),data,'jpeg','RGB','RGB')#
+#    print image.info
+#    enhancer = ImageEnhance.Sharpness(image)
+#    enhancer = ImageEnhance.Color(image)
+#    for i in range(8):
+#        factor = i / 4.0
+#        enhancer.enhance(factor).show("Sharpness %f" % factor)
+
+#    from StringIO import StringIO
+#    import Image
+#    import ImageEnhance
+#    f = StringIO(data)
+#    image = Image.open(f)
+#    enhancer = ImageEnhance.Contrast(image)
+#    image = enhancer.enhance(2.0)
+#    img_name = 'code.bmp'
+#    image.save(img_name,format = 'bmp')
+    
+    args = ['tesseract %s ocr' % img_name]
+    #~ print os.getcwd(),args
+    proc = subprocess.Popen(args, shell=True)
+    retcode = proc.wait()
+    if retcode!=0:
+        return 2
+    f = open('ocr.txt','r')
+    s = f.read().strip()
+    f.close()
+#    sys.exit(7)
+    try:
+        os.remove(img_name)
+        os.remove('ocr.txt')
+    except:
+        pass
+    
+    return s
+    
 def checkflow():
     headers = {"User-Agetn":"Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.2.10) Gecko/20100916 Firefox/3.6.10","Content-type": "application/x-www-form-urlencoded", "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8","Keep-Alive":"115","Connection":"keep-alive"}
     conn = httplib.HTTPConnection( "a.lzu.edu.cn" )  
@@ -130,39 +183,9 @@ def checkflow():
     response1 = conn1.getresponse()
     #print response1.getheaders()
     data = response1.read()
-    from StringIO import StringIO
-    f = StringIO(data)
-    image = Image.open(f)
-    #~ s = image_to_string(image)[:4]
-#    image = Image.fromstring('RGB',(60,20),data,'jpeg','RGB','RGB')#
-#    print image.info
-    import ImageEnhance
-#    enhancer = ImageEnhance.Sharpness(image)
-    enhancer = ImageEnhance.Contrast(image)
-#    enhancer = ImageEnhance.Color(image)
-    image = enhancer.enhance(2.0)
-#    for i in range(8):
-#        factor = i / 4.0
-#        enhancer.enhance(factor).show("Sharpness %f" % factor)
-    image.save('code.bmp',format = 'bmp')
-    args = ['tesseract code.bmp ocr']
-    #~ print os.getcwd(),args
-    proc = subprocess.Popen(args, shell=True)
-    retcode = proc.wait()
-    if retcode!=0:
-        return 2
-    f = open('ocr.txt','r')
-    s = f.read().strip()
-    print s
-    f.close()
-#    sys.exit(7)
-    try:
-        os.remove('code.bmp')
-        os.remove('ocr.txt')
-    except:
-        pass
     conn1.close()
-
+    s = ocr(data)
+    
     conn2 = httplib.HTTPConnection("a.lzu.edu.cn")
     params = urllib.urlencode( {'user_id':userid,'passwd':passwd,'validateCode':s} )
     #print params
@@ -188,6 +211,7 @@ def checkflow():
     response4 = conn4.getresponse()
     data = response4.read()
     conn4.close()
+    print data[0]
     mb = re.findall(option1,data)
     hour = re.findall(option2,data)
     global CHK_COUNT
@@ -198,6 +222,7 @@ def checkflow():
         return (MB, HOUR)
     elif CHK_COUNT < 5:
         CHK_COUNT += 1
+        time.sleep(0.1)
         checkflow()
     else:
         return 1
@@ -244,28 +269,27 @@ if __name__ == "__main__":
             #print 'login'
             result = login()
             if result is 1 or u'可用流量' in result:
-                self.Dialog("登录成功", result)
+                self.Dialog(TITLE_LOGIN, MSG_LOGIN % result)
             else:
-                self.Dialog('错误', result, icon = gtk.MESSAGE_ERROR)
+                self.Dialog(TITLE_ERR, result, icon = gtk.MESSAGE_ERROR)
         
         def logout(self, widget, data=None):
             #print 'logout'
             if logout():
-                self.Dialog('退出', data='您已经成功退出:-)')
+                self.Dialog(TITLE_LOGOUT, MSG_LOGOUT)
             else :
                 self.logout
 
         def checkflow(self, widget, data=None):
             flow = checkflow()
-            print flow
-            if flow is 1:
-                self.Dialog('错误', '请检查conf.txt中的邮箱和密码是否正确', icon = gtk.MESSAGE_ERROR)
+            if type(flow) is type(tuple()):
+                self.Dialog(TITLE_FLOW, MSG_FLOW % flow)
+            elif flow is 1:
+                self.Dialog(TITLE_ERR, ERR_OCR, 'error')
                 sys.exit(4)
-            elif flow is None:
-                self.Dialog('错误', '发生错误，请稍候再试', icon = gtk.MESSAGE_ERROR)
-            else:
-                self.Dialog('流量查询', '您本月已经使用的流量为 %s MB\n您本月已经上网 %s 小时' % flow)
-        
+#            elif flow is None:
+#                self.Dialog(TITLE_ERR, '发生错误，请稍候再试', 'error')
+                        
         def Dialog(self, title, data=None, icon = gtk.MESSAGE_INFO):
             dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, icon, gtk.BUTTONS_NONE, data)
             dialog.set_position(gtk.WIN_POS_CENTER)
@@ -295,7 +319,7 @@ if __name__ == "__main__":
             about.destroy()
         
         def Usage(self, widget):
-            dialog = gtk.Dialog('用法', None, gtk.DIALOG_DESTROY_WITH_PARENT, (gtk.STOCK_OK, gtk.RESPONSE_OK))
+            dialog = gtk.Dialog(TITLE_USAGE, None, gtk.DIALOG_DESTROY_WITH_PARENT, (gtk.STOCK_OK, gtk.RESPONSE_OK))
             data = "%s" % __doc__
             buffer = gtk.TextBuffer()
             buffer.set_text(data)
@@ -327,9 +351,9 @@ if __name__ == "__main__":
             actiongroup.add_actions([('Quit', gtk.STOCK_QUIT, '退出(_Q)', None,
                                       '退出', self.DestroyAll),
                                       ('About', gtk.STOCK_ABOUT, '关于(_A)', None,
-                                      '关于', self.About),
+                                      TITLE_ABOUT, self.About),
                                       ('Usage', gtk.STOCK_INFO, '用法(_U)', None,
-                                      '用法', self.Usage),
+                                      TITLE_USAGE, self.Usage),
                                      ('File', gtk.STOCK_FILE, '文件(_F)'),
                                      ('Help', gtk.STOCK_HELP, '帮助(_H)'),
                                      
@@ -381,7 +405,7 @@ if __name__ == "__main__":
 
     start = Interface()
     if IOERR:
-        start.Dialog('错误', '无法打开配置文件conf.txt，请确认文件存在并有访问权限', icon = gtk.MESSAGE_ERROR)
+        start.Dialog(TITLE_ERR, ERR_CONF, icon = gtk.MESSAGE_ERROR)
         sys.exit(3)
     gtk.main()
 

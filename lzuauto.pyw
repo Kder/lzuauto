@@ -54,13 +54,14 @@ class Application(Tkinter.Frame):
     def login(self):
         result = main.login()
         if result is 1 or u'可用流量' in result:
-            self.Dialog('登录成功', u"登录成功^_^ %s" % result)
+            self.Dialog(main.TITLE_LOGIN, main.MSG_LOGIN.decode('utf-8')
+             % result)
         else:
-            self.Dialog('错误', result, 'error')
+            self.Dialog(main.TITLE_ERR, result, 'error')
  
     def logout(self):
         if main.logout():
-            self.Dialog("退出外网", '您已经成功退出:-)\n')
+            self.Dialog(main.TITLE_LOGOUT, main.MSG_LOGOUT)
         else :
             self.logout
 
@@ -68,21 +69,21 @@ class Application(Tkinter.Frame):
         flow = main.checkflow()
 #        print flow
         if type(flow) is type(tuple()):
-            self.Dialog('流量查询', '您本月已经使用的流量为 %s MB\n您本月已经上网 %s 小时' % flow)
+            self.Dialog(main.TITLE_FLOW, main.MSG_FLOW % flow)
         elif flow is 1:
-            self.Dialog('错误', '请检查conf.txt中的邮箱和密码是否正确', 'error')
+            self.Dialog(main.TITLE_ERR, main.ERR_OCR, 'error')
             sys.exit(4)
-        elif flow is None:
-            self.Dialog('错误', '发生错误，请稍候再试', 'error')
+#        elif flow is None:
+#            self.Dialog('错误', '发生错误，请稍候再试', 'error')
 
     def Dialog(self, title=None, data=None, icon='info'):
         tkMessageBox.showinfo(title, data, icon=icon)
         
     def About(self, event=None):
-        self.Dialog('关于', "lzuauto %s\n作者： ysjdxcn & Kder\n项目主页： http://code.google.com/p/lzuauto/ \nLicense : GPLv3" % __version__)
+        self.Dialog(main.TITLE_ABOUT, "lzuauto %s\n作者： ysjdxcn & Kder\n项目主页： http://code.google.com/p/lzuauto/ \nLicense : GPLv3" % __version__)
         
     def Usage(self, event=None):
-        textView.view_text(self, '用法', __doc__)
+        textView.view_text(self, main.TITLE_USAGE, __doc__)
 
     def createWidgets(self):
 
@@ -137,7 +138,7 @@ if __name__ == "__main__":
     app = Application(master=root)
     #~ app.Dialog('hi','welcome')
     if main.IOERR:
-        app.Dialog('错误', '无法打开配置文件conf.txt，请确认文件存在并有访问权限', 'error')
+        app.Dialog(main.TITLE_ERR, main.ERR_CONF, 'error')
         sys.exit(3)
     app.mainloop()
     # root.destroy()
