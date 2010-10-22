@@ -16,9 +16,9 @@ lzuauto - 兰大上网认证系统自动登录工具。
     
     Linux下面需要的依赖：
     
-        python(标准发行版里面的版本都应该支持，理论上不支持python3.0且未测试)
+        python(py2.5以上，支持python3)
         tcl和tk
-        tesseract(一个ocr工具，项目主页 http://code.google.com/p/tesseract-ocr/ ）
+        tesseract(ocr工具，主页 http://code.google.com/p/tesseract-ocr/ ）
         各大发行版的源中应该都有上面的包，在Arch Linux和Gentoo Linux下测试通过。
         
     Windows下需要的依赖：
@@ -42,9 +42,9 @@ import main
 
 
 __version__ = '1.1.1'
-__revision__ = "$Revision: 44 $"
-__date__ = '$Date: 2010-10-22 20:58:22 +0800 (星期五, 2010-10-22) $'
-__author__= '$Author: kderlin $'
+__revision__ = "$Revision$"
+__date__ = '$Date$'
+__author__= '$Author$'
 
 
 class Application(tkinter.Frame):

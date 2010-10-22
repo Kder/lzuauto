@@ -16,7 +16,7 @@ lzuauto - 兰大上网认证系统自动登录工具。
     
     Linux下面需要的依赖：
     
-        python(标准发行版里面的版本都应该支持，理论上不支持python3.0且未测试)
+        python(py2.5以上)
         tcl和tk
         tesseract(一个ocr工具，项目主页 http://code.google.com/p/tesseract-ocr/ ）
         各大发行版的源中应该都有上面的包，在Arch Linux和Gentoo Linux下测试通过。
