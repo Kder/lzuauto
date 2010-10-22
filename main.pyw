@@ -68,6 +68,7 @@ import re
 CHK_COUNT = 0
 
 ERR_CONF = '无法打开配置文件conf.txt或者文件格式错误，请确认文件存在，且格式为 邮箱 密码'
+ERR_AUTH = '请检查conf.txt中的邮箱和密码是否正确(格式为"邮箱 密码"，不含引号)'
 ERR_OCR = '请检查conf.txt中的邮箱和密码是否正确；如果设置正确，请稍候再试一次'
 ERR_TESSERACT = 'tesseract错误，请确认tesseract是否正确安装'
 ERR_DJPEG = 'djpeg错误，请确认libjpeg是否正确安装且djpeg命令可用'
@@ -239,7 +240,7 @@ rv:1.9.2.10)Gecko/20101020 Firefox/3.6.11",
             time.sleep(0.2)
             continue
         else:
-            return res[0]
+            return res[0] + '\n' + unicode(ERR_AUTH, 'utf-8')
 
     conn3 = httplib.HTTPConnection("a.lzu.edu.cn")
     conn3.request('GET', '/selfIndexAction.do',headers = headers)
