@@ -1,4 +1,5 @@
 main.pyw
+lzuauto.pyw
 conf.txt
 tesseract.exe
 tessdata

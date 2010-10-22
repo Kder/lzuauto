@@ -48,8 +48,8 @@ __license__ = 'GNU General Public License v3'
 __status__ = 'Release'
 __projecturl__ = 'http://code.google.com/p/lzuauto/'
 
-rev = "$Revision$"
-__version__ = '1.1.0' + ('.%s' % rev.split(':')[1][:-1].strip())
+__revision__ = "$Revision$"
+__version__ = '1.1.0'
 __date__ = '$Date$'
 
 import os
@@ -68,6 +68,9 @@ CHK_COUNT = 0
 IOERR = False
 ERR_CONF = '无法打开配置文件conf.txt，请确认文件存在并有访问权限'
 ERR_OCR = '请检查conf.txt中的邮箱和密码是否正确；如果设置正确，请稍候再试一次'
+ERR_TESSERACT = 'tesseract错误，请确认tesseract是否正确安装'
+ERR_DJPEG = 'djpeg错误，请确认libjpeg是否正确安装且djpeg命令可用'
+ERR_IO = '文件写入错误，请确认程序所在目录有读写权限'
 MSG_FLOW = '您本月已经使用的流量为 %s MB\n您本月已经上网 %s 小时'
 MSG_LOGIN = "登录成功^_^ %s"
 MSG_LOGOUT = '您已经成功退出:-)\n'
@@ -116,13 +119,17 @@ def logout():
         return 0
 
 def ocr(data):
-    if data is not None:
+    '''input: jpeg image string stream
+       output: ocr result string
+    '''
+    try:
         img_name = 'code.jpg'
         img_file = open(img_name, 'wb')
         img_file.write(data)
         img_file.close()
-    else:
-        return 9
+    except:
+        return 5
+
     #~ s = image_to_string(image)[:4]
 #    image = Image.fromstring('RGB',(60,20),data,'jpeg','RGB','RGB')#
 #    print image.info
@@ -147,17 +154,17 @@ def ocr(data):
             subprocess.Popen('djpeg -bmp code.jpg > code.bmp', shell=True)
             img_name = 'code.bmp'
         except:
-            return 8
+            return 6
     args = ['tesseract %s ocr' % img_name]
     #~ print os.getcwd(),args
     proc = subprocess.Popen(args, shell=True)
     retcode = proc.wait()
     if retcode!=0:
-        return 2
+        return 7
     f = open('ocr.txt','r')
     s = f.read().strip()
     f.close()
-#    sys.exit(7)
+#    sys.exit(-1)
     try:
         os.remove(img_name)
         os.remove('ocr.txt')
@@ -291,10 +298,14 @@ if __name__ == "__main__":
             if type(flow) is type(tuple()):
                 self.Dialog(TITLE_FLOW, MSG_FLOW % flow)
             elif flow is 1:
-                self.Dialog(TITLE_ERR, ERR_OCR, 'error')
+                self.Dialog(TITLE_ERR, ERR_OCR, icon = gtk.MESSAGE_ERROR)
                 sys.exit(4)
-#            elif flow is None:
-#                self.Dialog(TITLE_ERR, '发生错误，请稍候再试', 'error')
+            elif flow is 5:
+                self.Dialog(TITLE_ERR, ERROR_IO, icon = gtk.MESSAGE_ERROR)
+            elif flow is 6:
+                self.Dialog(TITLE_ERR, ERR_DJPEG, icon = gtk.MESSAGE_ERROR)
+            elif flow is 7:
+                self.Dialog(TITLE_ERR, ERR_TESSERACT, icon = gtk.MESSAGE_ERROR)
                         
         def Dialog(self, title, data=None, icon = gtk.MESSAGE_INFO):
             dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, icon, gtk.BUTTONS_NONE, data)
@@ -311,7 +322,7 @@ if __name__ == "__main__":
         def About(self, widget):
             about = gtk.AboutDialog()
             about.set_program_name("lzuauto")
-            about.set_version(__version__)
+            about.set_version('%s.%s' % (__version__, __revision__.split(':')[1][:-1].strip()))
             about.set_copyright("(c) ysjdxcn & Kder")
             about.set_license('GNU General Public License v3')
     #        about.set_wrap_license(1)

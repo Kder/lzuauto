@@ -37,8 +37,8 @@ py_compile.compile('main.pyw','main.pyc')
 import main
 
 
-rev = "$Revision$"
-__version__ = '1.1.0' + ('.%s' % rev.split(':')[1][:-1].strip())
+__version__ = '1.1.0'
+__revision__ = "$Revision$"
 __date__ = '$Date$'
 __author__= '$Author$'
 
@@ -47,7 +47,7 @@ class Application(Tkinter.Frame):
 
     def login(self):
         result = main.login()
-        if result is 1 or u'可用流量' in result:
+        if result is 1 or 'M)' in result:
             self.Dialog(main.TITLE_LOGIN, main.MSG_LOGIN.decode('utf-8')
              % result)
         else:
@@ -61,20 +61,23 @@ class Application(Tkinter.Frame):
 
     def checkflow(self):
         flow = main.checkflow()
-#        print flow
         if type(flow) is type(tuple()):
             self.Dialog(main.TITLE_FLOW, main.MSG_FLOW % flow)
         elif flow is 1:
             self.Dialog(main.TITLE_ERR, main.ERR_OCR, 'error')
             sys.exit(4)
-#        elif flow is None:
-#            self.Dialog('错误', '发生错误，请稍候再试', 'error')
+        elif flow is 5:
+            self.Dialog(main.TITLE_ERR, main.ERROR_IO, 'error')
+        elif flow is 6:
+            self.Dialog(main.TITLE_ERR, main.ERR_DJPEG, 'error')
+        elif flow is 7:
+            self.Dialog(main.TITLE_ERR, main.ERR_TESSERACT, 'error')
 
     def Dialog(self, title=None, data=None, icon='info'):
         tkMessageBox.showinfo(title, data, icon=icon)
         
     def About(self, event=None):
-        self.Dialog(main.TITLE_ABOUT, "lzuauto %s\n作者： ysjdxcn & Kder\n项目主页： http://code.google.com/p/lzuauto/ \nLicense : GPLv3" % __version__)
+        self.Dialog(main.TITLE_ABOUT, "lzuauto %s.%s\n作者： ysjdxcn & Kder\n项目主页： http://code.google.com/p/lzuauto/ \nLicense : GPLv3" % (__version__, __revision__.split(':')[1][:-1].strip()))
         
     def Usage(self, event=None):
         textView.view_text(self, main.TITLE_USAGE, __doc__)
