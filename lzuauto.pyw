@@ -50,7 +50,9 @@ __author__= '$Author$'
 class Application(Tkinter.Frame):
 
     def login(self):
-        result = main.login()
+        if main.loadconf() is 8:
+            self.Dialog(main.TITLE_ERR, main.ERR_CONF, 'error')
+        result = main.login(main.loadconf())
         if result is 1 or 'M)' in result:
             self.Dialog(main.TITLE_LOGIN, main.MSG_LOGIN.decode('utf-8')
              % result)
@@ -64,7 +66,9 @@ class Application(Tkinter.Frame):
             self.logout
 
     def checkflow(self):
-        flow = main.checkflow()
+        if main.loadconf() is 8:
+            self.Dialog(main.TITLE_ERR, main.ERR_CONF, 'error')
+        flow = main.checkflow(main.loadconf())
         if type(flow) is type(tuple()):
             self.Dialog(main.TITLE_FLOW, main.MSG_FLOW % flow)
         elif flow is 1:
@@ -138,7 +142,7 @@ if __name__ == "__main__":
     root = Tkinter.Tk()
     app = Application(master=root)
     #~ app.Dialog('hi','welcome')
-    if main.IOERR:
+    if main.loadconf() is 8:
         app.Dialog(main.TITLE_ERR, main.ERR_CONF, 'error')
         sys.exit(3)
     app.mainloop()

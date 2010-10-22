@@ -58,6 +58,7 @@ import subprocess
 import time
 import urllib
 import httplib
+import string
 import re
 
 
@@ -65,8 +66,8 @@ import re
 
 
 CHK_COUNT = 0
-IOERR = False
-ERR_CONF = '无法打开配置文件conf.txt，请确认文件存在并有访问权限'
+
+ERR_CONF = '无法打开配置文件conf.txt或者文件格式错误，请确认文件存在，且格式为“邮箱 密码”（）'
 ERR_OCR = '请检查conf.txt中的邮箱和密码是否正确；如果设置正确，请稍候再试一次'
 ERR_TESSERACT = 'tesseract错误，请确认tesseract是否正确安装'
 ERR_DJPEG = 'djpeg错误，请确认libjpeg是否正确安装且djpeg命令可用'
@@ -81,17 +82,21 @@ TITLE_USAGE = '用法'
 TITLE_ERR = '错误'
 TITLE_FLOW = '流量查询'
 
-try:
-    f = open('conf.txt')
-    userid, passwd = f.readline().split()
-    f.close()
-except:
-    IOERR = True
 option = 'alert(.*?);'
 option1 = '<td bgcolor=\"FFFBF0\" align=\"center\" colspan=5>(.*?)MB'
 option2 = '<td bgcolor=\"FFFBF0\" align=\"center\" colspan=5>(.*?)Hours'
 
-def login():
+
+def loadconf():
+    try:
+        f = open('conf.txt')
+        userid, passwd = string.split(f.readline().strip(), maxsplit=1)
+        f.close()
+    except:
+        return 8
+    return userid, passwd
+
+def login((userid, passwd)):
     params = urllib.urlencode( {'userid':userid,'password':passwd,'serivce':'intenet','chap':'0','random':'internet','x':'25','y':'12'} )
     headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
     conn = httplib.HTTPConnection( "1.1.1.1" )  
@@ -173,7 +178,7 @@ def ocr(data):
     
     return s
     
-def checkflow():
+def checkflow((userid, passwd)):
     headers = {"User-Agetn":"Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.2.10) Gecko/20100916 Firefox/3.6.10","Content-type": "application/x-www-form-urlencoded", "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8","Keep-Alive":"115","Connection":"keep-alive"}
     conn = httplib.HTTPConnection( "a.lzu.edu.cn" )  
     conn.request( 'GET', '/', headers = headers )
@@ -280,7 +285,9 @@ if __name__ == "__main__":
         
         def login(self, widget, data=None):
             #print 'login'
-            result = login()
+            if loadconf() == 8:
+                start.Dialog(TITLE_ERR, ERR_CONF, icon = gtk.MESSAGE_ERROR)
+            result = login(loadconf())
             if result is 1 or 'M)' in result:
                 self.Dialog(TITLE_LOGIN, MSG_LOGIN % result)
             else:
@@ -294,7 +301,9 @@ if __name__ == "__main__":
                 self.logout
 
         def checkflow(self, widget, data=None):
-            flow = checkflow()
+            if loadconf() == 8:
+                start.Dialog(TITLE_ERR, ERR_CONF, icon = gtk.MESSAGE_ERROR)
+            flow = checkflow(loadconf())
             if type(flow) is type(tuple()):
                 self.Dialog(TITLE_FLOW, MSG_FLOW % flow)
             elif flow is 1:
@@ -421,7 +430,7 @@ if __name__ == "__main__":
 
 
     start = Interface()
-    if IOERR:
+    if loadconf() is 8:
         start.Dialog(TITLE_ERR, ERR_CONF, icon = gtk.MESSAGE_ERROR)
         sys.exit(3)
     gtk.main()
