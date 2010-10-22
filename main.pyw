@@ -10,7 +10,7 @@ lzuauto - 兰大上网认证系统自动登录工具。
     
 使用方法
     
-    解压后，修改conf.txt，把自己的用户名密码填入。 运行 main.exe或main.pyw 就会出来主界面。
+    解压后，修改conf.txt，把自己的用户名密码填入。 运行 main.exe或main.pyw 即可。
     
 系统要求
     
@@ -18,7 +18,7 @@ lzuauto - 兰大上网认证系统自动登录工具。
     
         python(标准发行版里面的版本都应该支持，理论上不支持python3.0且未测试)
         pygtk
-        tesseract(一个ocr工具，项目主页 http://code.google.com/p/tesseract-ocr/ ）
+        tesseract(ocr工具，主页 http://code.google.com/p/tesseract-ocr/ )
         各大发行版的源中应该都有上面的包，在Arch Linux和Gentoo Linux下测试通过。
         
     Windows下需要的依赖：
@@ -42,15 +42,15 @@ __copyright__ = 'Copyright 2010 ysjdxcn & Kder'
 __credits__ = ['ysjdxcn','Kder']
 
 __maintainer__ = ['ysjdxcn','Kder']
-__email__ = ['ysjdxcn (#) gmail dot com', 'kderlin (#) gmail dot com']
+__email__ = ['ysjdxcn (#)gmail dot com', 'kderlin (#)gmail dot com']
 __url__ = ['http://ranhouzenyang.com/', 'http://www.kder.info']
 __license__ = 'GNU General Public License v3'
 __status__ = 'Release'
 __projecturl__ = 'http://code.google.com/p/lzuauto/'
 
 __revision__ = "$Revision$"
-__version__ = '1.1.1'
-__date__ = '$Date$'
+__version__ = '1.1.2'
+__date__ = '$Date: 2010-10-22 17:53:48 +0800 (星期五, 2010-10-22)$'
 
 import os
 import sys
@@ -67,7 +67,7 @@ import re
 
 CHK_COUNT = 0
 
-ERR_CONF = '无法打开配置文件conf.txt或者文件格式错误，请确认文件存在，且格式为“邮箱 密码”（）'
+ERR_CONF = '无法打开配置文件conf.txt或者文件格式错误，请确认文件存在，且格式为 邮箱 密码'
 ERR_OCR = '请检查conf.txt中的邮箱和密码是否正确；如果设置正确，请稍候再试一次'
 ERR_TESSERACT = 'tesseract错误，请确认tesseract是否正确安装'
 ERR_DJPEG = 'djpeg错误，请确认libjpeg是否正确安装且djpeg命令可用'
@@ -85,7 +85,7 @@ TITLE_FLOW = '流量查询'
 option = 'alert(.*?);'
 option1 = '<td bgcolor=\"FFFBF0\" align=\"center\" colspan=5>(.*?)MB'
 option2 = '<td bgcolor=\"FFFBF0\" align=\"center\" colspan=5>(.*?)Hours'
-
+option3 = '<font color=red>(.*?)</font>'
 
 def loadconf():
     try:
@@ -97,12 +97,14 @@ def loadconf():
     return userid, passwd
 
 def login((userid, passwd)):
-    params = urllib.urlencode( {'userid':userid,'password':passwd,'serivce':'intenet','chap':'0','random':'internet','x':'25','y':'12'} )
-    headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
-    conn = httplib.HTTPConnection( "1.1.1.1" )  
-    conn.request( "POST", "/passwd.magi", params, headers )
+    params = urllib.urlencode({'userid':userid,'password':passwd,
+    'serivce':'intenet','chap':'0','random':'internet','x':'25','y':'12'})
+    headers = {"Content-type": "application/x-www-form-urlencoded", 
+    "Accept": "text/plain"}
+    conn = httplib.HTTPConnection("1.1.1.1")
+    conn.request("POST", "/passwd.magi", params, headers)
     response = conn.getresponse()
-    data = response.read() 
+    data = response.read()
     conn.close()
     #print data
     result = re.findall(option, data)
@@ -112,10 +114,11 @@ def login((userid, passwd)):
         return 1
 
 def logout():
-    params = urllib.urlencode( {'imageField.x':'44','imageField.y':'27'} )
-    headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
-    conn = httplib.HTTPConnection( "1.1.1.1" )  
-    conn.request( "POST", "/userout.magi", params, headers )
+    params = urllib.urlencode({'imageField.x':'44','imageField.y':'27'})
+    headers = {"Content-type": "application/x-www-form-urlencoded", 
+    "Accept": "text/plain"}
+    conn = httplib.HTTPConnection("1.1.1.1")
+    conn.request("POST", "/userout.magi", params, headers)
     response = conn.getresponse()
     conn.close()
     if response.status == 200:
@@ -178,10 +181,11 @@ def ocr(data):
     
     return s
     
-def checkflow((userid, passwd)):
-    headers = {"User-Agetn":"Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.2.10) Gecko/20100916 Firefox/3.6.10","Content-type": "application/x-www-form-urlencoded", "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8","Keep-Alive":"115","Connection":"keep-alive"}
-    conn = httplib.HTTPConnection( "a.lzu.edu.cn" )  
-    conn.request( 'GET', '/', headers = headers )
+
+def verify((userid, passwd), headers):
+
+    conn = httplib.HTTPConnection("a.lzu.edu.cn")
+    conn.request('GET', '/', headers = headers)
     response = conn.getresponse()
     #print response.getheaders()
     cookie = response.getheader('set-cookie').split()[0]
@@ -189,14 +193,14 @@ def checkflow((userid, passwd)):
     headers.update(temp)
     conn.close()
 
-    conn0 = httplib.HTTPConnection( "a.lzu.edu.cn" )  
-    conn0.request( 'GET', '/selfLogon.do', headers = headers )
+    conn0 = httplib.HTTPConnection("a.lzu.edu.cn")
+    conn0.request('GET', '/selfLogon.do', headers = headers)
     response0 = conn0.getresponse()
     #print response0.getheaders()
     conn0.close()
 
     conn1 = httplib.HTTPConnection("a.lzu.edu.cn")
-    conn1.request( 'GET', '/servlet/AuthenCodeImage', headers = headers)
+    conn1.request('GET', '/servlet/AuthenCodeImage', headers = headers)
     response1 = conn1.getresponse()
     #print response1.getheaders()
     data = response1.read()
@@ -205,50 +209,61 @@ def checkflow((userid, passwd)):
     if type(s) is not type(str()):
         return s
     conn2 = httplib.HTTPConnection("a.lzu.edu.cn")
-    params = urllib.urlencode( {'user_id':userid,'passwd':passwd,'validateCode':s} )
+    params = urllib.urlencode({'user_id':userid,'passwd':passwd,'validateCode':s})
     #print params
-    conn2.request( 'POST', '/selfLogonAction.do', params, headers = headers)
+    conn2.request('POST', '/selfLogonAction.do', params, headers = headers)
     response2 = conn2.getresponse()
-    #print response2.getheaders()
-    data = response2.read()
-#    f = open('result','w')
-#    f.write(data)
-#    f.close()
-#    print data            
+    data = response2.read().decode('gb2312')
     conn2.close()
     
+    err = re.findall(option3, data)
+    if 'selfLogon' in response2.getheaders()[3][1]:
+        print err
+    return err
+#    sys.exit()
+
+def checkflow((userid, passwd)):
+    headers = {"User-Agetn":"Mozilla/5.0 (X11; U; Linux i686; en-US; \
+rv:1.9.2.10)Gecko/20101020 Firefox/3.6.11",
+    "Content-type": "application/x-www-form-urlencoded",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,\
+*/*;q=0.8",
+    "Keep-Alive":"115",
+    "Connection":"keep-alive"}
+    for i in range(5):
+        res = verify((userid, passwd), headers)
+        if res == []:
+            break
+        if res[0] == '验证码错误，请重新提交。':
+            time.sleep(0.2)
+            continue
     conn3 = httplib.HTTPConnection("a.lzu.edu.cn")
-    conn3.request( 'GET', '/selfIndexAction.do',headers = headers)
+    conn3.request('GET', '/selfIndexAction.do',headers = headers)
     response3 = conn3.getresponse()
     data = response3.read()
 #    print data
     conn3.close()
 
     conn4 = httplib.HTTPConnection("a.lzu.edu.cn")
-    conn4.request( 'GET', '/userQueryAction.do',headers = headers)
+    conn4.request('GET', '/userQueryAction.do',headers = headers)
     response4 = conn4.getresponse()
     data = response4.read()
     conn4.close()
 #    print data[0]
     mb = re.findall(option1,data)
     hour = re.findall(option2,data)
-    global CHK_COUNT
+
     if len(mb)>0:
         MB = mb[0].split('&nbsp')[0][1:]
         HOUR = hour[0].split('&nbsp')[0]
 #        print MB,HOUR
         return (MB, HOUR)
-    elif CHK_COUNT < 5:
-        CHK_COUNT += 1
-        time.sleep(0.1)
-        checkflow()
-    else:
-        return 1
+
 
 def checkstatus():
     pass
 
-################################################################################
+#######################################################################
 
 if __name__ == "__main__":
     try:
@@ -285,7 +300,7 @@ if __name__ == "__main__":
         
         def login(self, widget, data=None):
             #print 'login'
-            if loadconf() == 8:
+            if loadconf()== 8:
                 start.Dialog(TITLE_ERR, ERR_CONF, icon = gtk.MESSAGE_ERROR)
             result = login(loadconf())
             if result is 1 or 'M)' in result:
@@ -301,10 +316,10 @@ if __name__ == "__main__":
                 self.logout
 
         def checkflow(self, widget, data=None):
-            if loadconf() == 8:
+            if loadconf()== 8:
                 start.Dialog(TITLE_ERR, ERR_CONF, icon = gtk.MESSAGE_ERROR)
             flow = checkflow(loadconf())
-            if type(flow) is type(tuple()):
+            if type(flow)is type(tuple()):
                 self.Dialog(TITLE_FLOW, MSG_FLOW % flow)
             elif flow is 1:
                 self.Dialog(TITLE_ERR, ERR_OCR, icon = gtk.MESSAGE_ERROR)
@@ -317,7 +332,8 @@ if __name__ == "__main__":
                 self.Dialog(TITLE_ERR, ERR_TESSERACT, icon = gtk.MESSAGE_ERROR)
                         
         def Dialog(self, title, data=None, icon = gtk.MESSAGE_INFO):
-            dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, icon, gtk.BUTTONS_NONE, data)
+            dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, icon, 
+                                       gtk.BUTTONS_NONE, data)
             dialog.set_position(gtk.WIN_POS_CENTER)
             dialog.set_title(title)
             #dialog.format_secondary_text('comments')
@@ -331,12 +347,15 @@ if __name__ == "__main__":
         def About(self, widget):
             about = gtk.AboutDialog()
             about.set_program_name("lzuauto")
-            about.set_version('%s.%s' % (__version__, __revision__.split(':')[1][:-1].strip()))
-            about.set_copyright("(c) ysjdxcn & Kder")
+            about.set_version('%s.%s' % (__version__, 
+            __revision__.split(':')[1][:-1].strip()))
+            about.set_copyright("(c)ysjdxcn & Kder")
             about.set_license('GNU General Public License v3')
     #        about.set_wrap_license(1)
-            about.set_authors(['ysjdxcn <ysjdxcn (#) gmail dot com>','Kder <kderlin (#) gmail dot com>'])
-            about.set_comments("兰大上网认证系统自动登录工具\n欢迎使用此工具，如果您有任何意见或者建议，请访问项目主页")
+            about.set_authors(['ysjdxcn <ysjdxcn (#)gmail dot com>',
+            'Kder <kderlin (#)gmail dot com>'])
+            about.set_comments("兰大上网认证系统自动登录工具\n欢迎使用此工具，\
+如果您有任何意见或者建议，请访问项目主页")
             about.set_website("http://code.google.com/p/lzuauto/")
             about.set_website_label("项目主页：http://lzuauto.googlecode.com")
     #        about.set_logo(gtk.gdk.pixbuf_new_from_file("code.jpg"))
@@ -345,7 +364,8 @@ if __name__ == "__main__":
             about.destroy()
         
         def Usage(self, widget):
-            dialog = gtk.Dialog(TITLE_USAGE, None, gtk.DIALOG_DESTROY_WITH_PARENT, (gtk.STOCK_OK, gtk.RESPONSE_OK))
+            dialog = gtk.Dialog(TITLE_USAGE, None, 
+            gtk.DIALOG_DESTROY_WITH_PARENT, (gtk.STOCK_OK, gtk.RESPONSE_OK))
             data = "%s" % __doc__
             buffer = gtk.TextBuffer()
             buffer.set_text(data)
@@ -374,15 +394,14 @@ if __name__ == "__main__":
             win.add_accel_group(accelgroup)
             actiongroup = gtk.ActionGroup('UIManagerExample')
             self.actiongroup = actiongroup
-            actiongroup.add_actions([('Quit', gtk.STOCK_QUIT, '退出(_Q)', None,
-                                      '退出', self.DestroyAll),
-                                      ('About', gtk.STOCK_ABOUT, '关于(_A)', None,
-                                      TITLE_ABOUT, self.About),
-                                      ('Usage', gtk.STOCK_INFO, '用法(_U)', None,
-                                      TITLE_USAGE, self.Usage),
+            actiongroup.add_actions([('Quit', gtk.STOCK_QUIT, '退出(_Q)',
+                                       None, '退出', self.DestroyAll),
+                                      ('About', gtk.STOCK_ABOUT, '关于(_A)',
+                                       None, TITLE_ABOUT, self.About),
+                                      ('Usage', gtk.STOCK_INFO, '用法(_U)',
+                                       None, TITLE_USAGE, self.Usage),
                                      ('File', gtk.STOCK_FILE, '文件(_F)'),
                                      ('Help', gtk.STOCK_HELP, '帮助(_H)'),
-                                     
                                      ])
             actiongroup.get_action('Quit').set_property('short-label', '_Quit')
 
@@ -392,7 +411,8 @@ if __name__ == "__main__":
             main_vbox.pack_start(menubar, False)
 
             image = []
-            stocks = [gtk.STOCK_CONNECT, gtk.STOCK_DISCONNECT, gtk.STOCK_INFO, gtk.STOCK_QUIT]
+            stocks = [gtk.STOCK_CONNECT, gtk.STOCK_DISCONNECT, gtk.STOCK_INFO, 
+                      gtk.STOCK_QUIT]
             button = []
             button_label = ["登录外网", "退出外网", "查询流量", "退出程序"]
             actions = [self.login, self.logout, self.checkflow, self.DestroyAll]
@@ -430,7 +450,7 @@ if __name__ == "__main__":
 
 
     start = Interface()
-    if loadconf() is 8:
+    if loadconf()is 8:
         start.Dialog(TITLE_ERR, ERR_CONF, icon = gtk.MESSAGE_ERROR)
         sys.exit(3)
     gtk.main()
