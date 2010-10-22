@@ -31,13 +31,15 @@ lzuauto - 兰大上网认证系统自动登录工具。
 import Tkinter
 import tkMessageBox 
 from idlelib import textView
-import py_compile
-py_compile.compile('main.pyw','main.pyc')
+
+if os.name == 'posix':
+    import py_compile
+    py_compile.compile('main.pyw','main.pyc')
 
 import main
 
 
-__version__ = '1.1.0'
+__version__ = '1.1.1'
 __revision__ = "$Revision$"
 __date__ = '$Date$'
 __author__= '$Author$'

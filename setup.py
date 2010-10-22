@@ -8,7 +8,7 @@ import main
 if len(sys.argv) == 1:
     sys.argv.append('py2exe')
 
-window_dict = {"script": "main.pyw",
+main_exe = {"script": "main.pyw",
 #"icon_resources": [(0,'bialix.ico')],
 "name": "lzuauto",
 "version": main.__version__,
@@ -20,19 +20,43 @@ window_dict = {"script": "main.pyw",
 }
 #the dict is from http://osdir.com/ml/python.py2exe/2004-08/msg00065.html
 
-setup(name = 'lzuauto',
-      windows=[window_dict],
-      zipfile = None,
-      options = {'py2exe': {'bundle_files': 1,
-                            'optimize': 2,
-                            'compressed': 1,
-                            'includes':['atk','dsextras','cairo','gio','pango','pangocairo'],
-                            'excludes' : ['_ssl', '_hashlib', 'doctest', 'pdb', 'unittest', 'difflib',
-                            'pyreadline', 'logging', 'email', 'ctypes', 'bz2', 'distutils', 'codegen',
-                            'inspect', 'pickle','unicodedata'],
-                            #'ascii' : True,
-                            #'dll_excludes' : ['msvcr71.dll'],
-                            'dist_dir':'lzuauto',
-                            }
-                },
+lzuauto_exe = main_exe.copy()
+lzuauto_exe["script"] = "lzuauto.pyw"
+
+print lzuauto_exe,main_exe
+
+options_main = {'py2exe': {'bundle_files': 1,
+            'optimize': 2,
+            'compressed': 1,
+            'includes':['atk','dsextras','cairo','gio','pango','pangocairo'],
+            'excludes' : ['_ssl', '_hashlib', 'doctest', 'pdb', 'unittest', 'difflib',
+            'pyreadline', 'logging', 'email', 'ctypes', 'bz2', 'distutils', 'codegen',
+            'inspect', 'pickle','unicodedata'],
+            #'ascii' : True,
+            #'dll_excludes' : ['msvcr71.dll'],
+            'dist_dir':'lzuauto',
+            }
+}
+
+options_lzuauto = {'py2exe': {'bundle_files': 3,
+            'optimize': 2,
+            'compressed': 1,
+            'excludes' : ['_ssl', '_hashlib', 'doctest', 'pdb', 'unittest', 'difflib',
+            'pyreadline', 'logging', 'email', 'ctypes', 'bz2', 'distutils', 'codegen',
+            'inspect', 'pickle','unicodedata', 'gtk', 'pygtk', 'gobject', 'pygobject',
+            'glib', 'atk','dsextras','cairo','gio','pango','pangocairo'],
+            'dist_dir':'lzuauto',
+            }
+}
+
+setup(name = 'lzuauto-tk',
+      windows=[lzuauto_exe],
+      options = options_lzuauto,
 )
+
+setup(name = 'lzuauto-gtk',
+      windows=[main_exe],
+      zipfile = None,
+      options = options_main,
+)
+
