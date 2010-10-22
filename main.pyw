@@ -202,8 +202,8 @@ def verify((userid, passwd), headers):
     conn2.close()
     
     err = re.findall(option3, data)
-    if 'selfLogon' in response2.getheaders()[3][1]:
-        print err
+#    if 'selfLogon' in response2.getheaders()[3][1]:
+    print err
     return err
 #    sys.exit()
 
@@ -235,9 +235,11 @@ rv:1.9.2.10)Gecko/20101020 Firefox/3.6.11",
         res = verify((userid, passwd), headers)
         if res == []:
             break
-        if res[0] == u'验证码错误，请重新提交。':
+        elif res[0] == u'验证码错误，请重新提交。':
             time.sleep(0.2)
             continue
+        else:
+            return res[0]
 
     conn3 = httplib.HTTPConnection("a.lzu.edu.cn")
     conn3.request('GET', '/selfIndexAction.do',headers = headers)
@@ -324,6 +326,8 @@ if __name__ == "__main__":
             flow = checkflow(loadconf())
             if type(flow)is type(tuple()):
                 self.Dialog(TITLE_FLOW, MSG_FLOW % flow)
+            elif type(flow)is type(unicode()):
+                self.Dialog(TITLE_ERR, flow, icon = gtk.MESSAGE_ERROR)
             elif flow is 1:
                 self.Dialog(TITLE_ERR, ERR_OCR, icon = gtk.MESSAGE_ERROR)
                 sys.exit(4)

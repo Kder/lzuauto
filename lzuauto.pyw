@@ -71,6 +71,8 @@ class Application(Tkinter.Frame):
         flow = main.checkflow(main.loadconf())
         if type(flow) is type(tuple()):
             self.Dialog(main.TITLE_FLOW, main.MSG_FLOW % flow)
+        elif type(flow) is type(unicode()):
+            self.Dialog(main.TITLE_ERR, flow, 'error')
         elif flow is 1:
             self.Dialog(main.TITLE_ERR, main.ERR_OCR, 'error')
             sys.exit(4)
