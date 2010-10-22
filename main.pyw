@@ -184,21 +184,6 @@ def ocr(data):
 
 def verify((userid, passwd), headers):
 
-    conn = httplib.HTTPConnection("a.lzu.edu.cn")
-    conn.request('GET', '/', headers = headers)
-    response = conn.getresponse()
-    #print response.getheaders()
-    cookie = response.getheader('set-cookie').split()[0]
-    temp = {'Cookie':cookie}
-    headers.update(temp)
-    conn.close()
-
-    conn0 = httplib.HTTPConnection("a.lzu.edu.cn")
-    conn0.request('GET', '/selfLogon.do', headers = headers)
-    response0 = conn0.getresponse()
-    #print response0.getheaders()
-    conn0.close()
-
     conn1 = httplib.HTTPConnection("a.lzu.edu.cn")
     conn1.request('GET', '/servlet/AuthenCodeImage', headers = headers)
     response1 = conn1.getresponse()
@@ -230,13 +215,30 @@ rv:1.9.2.10)Gecko/20101020 Firefox/3.6.11",
 */*;q=0.8",
     "Keep-Alive":"115",
     "Connection":"keep-alive"}
+    
+    conn = httplib.HTTPConnection("a.lzu.edu.cn")
+    conn.request('GET', '/', headers = headers)
+    response = conn.getresponse()
+    #print response.getheaders()
+    cookie = response.getheader('set-cookie').split()[0]
+    temp = {'Cookie':cookie}
+    headers.update(temp)
+    conn.close()
+
+    conn0 = httplib.HTTPConnection("a.lzu.edu.cn")
+    conn0.request('GET', '/selfLogon.do', headers = headers)
+    response0 = conn0.getresponse()
+    #print response0.getheaders()
+    conn0.close()
+
     for i in range(5):
         res = verify((userid, passwd), headers)
         if res == []:
             break
-        if res[0] == '验证码错误，请重新提交。':
+        if res[0] == u'验证码错误，请重新提交。':
             time.sleep(0.2)
             continue
+
     conn3 = httplib.HTTPConnection("a.lzu.edu.cn")
     conn3.request('GET', '/selfIndexAction.do',headers = headers)
     response3 = conn3.getresponse()
@@ -249,6 +251,7 @@ rv:1.9.2.10)Gecko/20101020 Firefox/3.6.11",
     response4 = conn4.getresponse()
     data = response4.read()
     conn4.close()
+    
 #    print data[0]
     mb = re.findall(option1,data)
     hour = re.findall(option2,data)
