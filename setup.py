@@ -4,6 +4,7 @@ from distutils.core import setup
 import py2exe
 import sys
 import main
+import lzuauto
 
 if len(sys.argv) == 1:
     sys.argv.append('py2exe')
@@ -11,7 +12,7 @@ if len(sys.argv) == 1:
 main_exe = {"script": "main.pyw",
 #"icon_resources": [(0,'bialix.ico')],
 "name": "lzuauto",
-"version": main.__version__,
+"version": '%s.%s' % (main.__version__, main.__revision__.split(':')[1][:-1].strip()),
 "description": u"兰大上网认证系统客户端",
 "author": ['ysjdxcn','Kder'],
 "copyright": 'Copyright 2010 ysjdxcn, Kder',
@@ -21,9 +22,8 @@ main_exe = {"script": "main.pyw",
 #the dict is from http://osdir.com/ml/python.py2exe/2004-08/msg00065.html
 
 lzuauto_exe = main_exe.copy()
-lzuauto_exe["script"] = "lzuauto.pyw"
-
-print lzuauto_exe,main_exe
+lzuauto_exe["script"] = 'lzuauto.pyw'
+lzuauto_exe["version"] = '%s.%s' % (lzuauto.__version__, lzuauto.__revision__.split(':')[1][:-1].strip())
 
 options_main = {'py2exe': {'bundle_files': 1,
             'optimize': 2,

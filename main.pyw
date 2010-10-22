@@ -49,7 +49,7 @@ __status__ = 'Release'
 __projecturl__ = 'http://code.google.com/p/lzuauto/'
 
 __revision__ = "$Revision$"
-__version__ = '1.1.0'
+__version__ = '1.1.1'
 __date__ = '$Date$'
 
 import os

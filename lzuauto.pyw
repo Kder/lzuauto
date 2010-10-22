@@ -28,6 +28,7 @@ lzuauto - 兰大上网认证系统自动登录工具。
 '''
 
 
+import os
 import Tkinter
 import tkMessageBox 
 from idlelib import textView
