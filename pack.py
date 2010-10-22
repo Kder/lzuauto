@@ -6,12 +6,24 @@ from main import __version__ as main_ver
 from lzuauto import __version__ as lzuauto_ver
 
 
+src_files = [
+'main.pyw',
+'lzuauto.pyw',
+'conf.txt',
+'tesseract.exe',
+'leptonlib.dll',
+'tessdata',
+'setup.py',
+'pack.py',
+]
+src_args = ' '.join(src_files)
+
 try:
     os.system('upx lzuauto/main.exe lzuauto/tcl85.dll lzuauto/tk85.dll \
     lzuauto/python26.dll lzuauto/*.pyd')
 
-    os.system('7z a -t7z -xr!*.svn* lzuauto-%s-src.7z @file_list.txt' % \
-                main_ver)
+    os.system('7z a -t7z -xr!*.svn* lzuauto-%s-src.7z %s' % \
+                (main_ver, src_args))
 except:
     sys.stderr.write('Please make sure upx and 7z are in system path.')
     sys.exit(-1)
@@ -20,7 +32,7 @@ os.system('7z a -t7z -xr!*.svn* lzuauto-%s-win.7z lzuauto/main.exe \
 lzuauto/conf.txt lzuauto/tesseract.exe lzuauto/tessdata \
 lzuauto/leptonlib.dll' % main_ver)
 
-files = [
+tk_files = [
 'lzuauto/lzuauto.exe',
 'lzuauto/conf.txt',
 'lzuauto/python26.dll',
@@ -41,7 +53,7 @@ files = [
 'lzuauto/tcl/tk8.5/ttk',
 ]
 
-args = ' '.join(files)
+tk_args = ' '.join(tk_files)
 
 os.system(r'7z a -t7z -xr!*.svn* lzuauto-%s-win-lite.7z %s' % \
-            (lzuauto_ver, args))
+            (lzuauto_ver, tk_args))

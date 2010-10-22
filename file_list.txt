@@ -1,9 +1,0 @@
-main.pyw
-lzuauto.pyw
-conf.txt
-tesseract.exe
-leptonlib.dll
-tessdata
-setup.py
-pack.py
-file_list.txt
