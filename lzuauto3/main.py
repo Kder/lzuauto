@@ -98,8 +98,8 @@ def loadconf():
         return 8
     return userid, passwd
 
-def login(xxx_todo_changeme):
-    (userid, passwd) = xxx_todo_changeme
+def login(userpass):
+    (userid, passwd) = userpass
     params = urllib.parse.urlencode({'userid':userid,'password':passwd,
     'serivce':'intenet','chap':'0','random':'internet','x':'25','y':'12'})
     headers = {"Content-type": "application/x-www-form-urlencoded", 
@@ -185,9 +185,9 @@ def ocr(data):
     return s
     
 
-def verify(xxx_todo_changeme1, headers):
+def verify(userpass, headers):
 
-    (userid, passwd) = xxx_todo_changeme1
+    (userid, passwd) = userpass
     conn1 = http.client.HTTPConnection("a.lzu.edu.cn")
     conn1.request('GET', '/servlet/AuthenCodeImage', headers = headers)
     response1 = conn1.getresponse()
@@ -211,8 +211,8 @@ def verify(xxx_todo_changeme1, headers):
     return err
 #    sys.exit()
 
-def checkflow(xxx_todo_changeme2):
-    (userid, passwd) = xxx_todo_changeme2
+def checkflow(userpass):
+    (userid, passwd) = userpass
     headers = {"User-Agetn":"Mozilla/5.0 (X11; U; Linux i686; en-US; \
 rv:1.9.2.10)Gecko/20101020 Firefox/3.6.11",
     "Content-type": "application/x-www-form-urlencoded",
