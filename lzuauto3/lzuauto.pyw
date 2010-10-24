@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 #-*- coding=utf-8 -*-
 
-'''
-lzuauto - 兰大上网认证系统自动登录工具。
+'''lzuauto - 兰大上网认证系统自动登录工具。
     
 主要功能
     
@@ -24,7 +23,7 @@ lzuauto - 兰大上网认证系统自动登录工具。
     Windows下需要的依赖：
     
         Python2.5以上，下载地址：http://www.python.org
-    
+
 '''
 
 
@@ -32,7 +31,6 @@ import sys
 import os
 import tkinter
 import tkinter.messagebox 
-from idlelib import textView
 
 if os.name == 'posix':
     import py_compile
