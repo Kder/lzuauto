@@ -97,13 +97,101 @@ def loadconf():
         return 8
     return userid, passwd
 
+# Get the IP address of local machine
+# code from:
+# http://hi.baidu.com/yangyingchao/blog/item/8d26b544f6059f45500ffe78.html
+
+# for Linux
+def get_ip_address(ifname):
+    import socket
+    import fcntl
+    import struct
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    return socket.inet_ntoa(fcntl.ioctl(
+        s.fileno(),
+        0x8915,  # SIOCGIFADDR
+        struct.pack('256s', ifname[:15]))[20:24])
+
+#get_ip_address('lo')
+#get_ip_address('eth0')
+
+
+# for Windows
+def getIPAddresses():
+    from ctypes import Structure, windll, sizeof
+    from ctypes import POINTER, byref
+    from ctypes import c_ulong, c_uint, c_ubyte, c_char
+
+    MAX_ADAPTER_DESCRIPTION_LENGTH = 128
+    MAX_ADAPTER_NAME_LENGTH = 256
+    MAX_ADAPTER_ADDRESS_LENGTH = 8
+
+    class IP_ADDR_STRING(Structure):
+        pass
+    LP_IP_ADDR_STRING = POINTER(IP_ADDR_STRING)
+    IP_ADDR_STRING._fields_ = [
+        ("next", LP_IP_ADDR_STRING),
+        ("ipAddress", c_char * 16),
+        ("ipMask", c_char * 16),
+        ("context", c_ulong)]
+
+    class IP_ADAPTER_INFO (Structure):
+        pass
+    LP_IP_ADAPTER_INFO = POINTER(IP_ADAPTER_INFO)
+    IP_ADAPTER_INFO._fields_ = [
+        ("next", LP_IP_ADAPTER_INFO),
+        ("comboIndex", c_ulong),
+        ("adapterName", c_char * (MAX_ADAPTER_NAME_LENGTH + 4)),
+        ("description", c_char * (MAX_ADAPTER_DESCRIPTION_LENGTH + 4)),
+        ("addressLength", c_uint),
+        ("address", c_ubyte * MAX_ADAPTER_ADDRESS_LENGTH),
+        ("index", c_ulong),
+        ("type", c_uint),
+        ("dhcpEnabled", c_uint),
+        ("currentIpAddress", LP_IP_ADDR_STRING),
+        ("ipAddressList", IP_ADDR_STRING),
+        ("gatewayList", IP_ADDR_STRING),
+        ("dhcpServer", IP_ADDR_STRING),
+        ("haveWins", c_uint),
+        ("primaryWinsServer", IP_ADDR_STRING),
+        ("secondaryWinsServer", IP_ADDR_STRING),
+        ("leaseObtained", c_ulong),
+        ("leaseExpires", c_ulong)]
+    GetAdaptersInfo = windll.iphlpapi.GetAdaptersInfo
+    GetAdaptersInfo.restype = c_ulong
+    GetAdaptersInfo.argtypes = [LP_IP_ADAPTER_INFO, POINTER(c_ulong)]
+    adapterList = (IP_ADAPTER_INFO * 10)()
+    buflen = c_ulong(sizeof(adapterList))
+    rc = GetAdaptersInfo(byref(adapterList[0]), byref(buflen))
+    if rc == 0:
+        for a in adapterList:
+            adNode = a.ipAddressList
+            while True:
+                ipAddr = adNode.ipAddress
+                if ipAddr:
+                    yield ipAddr
+                adNode = adNode.next
+                if not adNode:
+                    break
+
+
+def get_ip():
+    if sys.platform == 'win32':
+        return [x for x in getIPAddresses()]
+    else:
+        return get_ip_address('eth0')
+
+ip = get_ip()[0]
+
 def login((userid, passwd)):
-    params = urllib.urlencode({'userid':userid,'password':passwd,
-    'serivce':'intenet','chap':'0','random':'internet','x':'25','y':'12'})
+    params = urllib.urlencode({'wlanuserip':ip,'wlanacname':'BAS_138',
+    'auth_type':'PAP','wlanacIp':'202.201.1.138','userid':userid,'passwd':passwd,
+    'chal_id':'','chal_vector':'','seq_id':'','req_id':''})
+    
     headers = {"Content-type": "application/x-www-form-urlencoded", 
     "Accept": "text/plain"}
-    conn = httplib.HTTPConnection("1.1.1.1")
-    conn.request("POST", "/passwd.magi", params, headers)
+    conn = httplib.HTTPConnection("202.201.1.140")
+    conn.request("POST", "/portalAuthAction.do", params, headers)
     response = conn.getresponse()
     data = response.read()
     conn.close()
@@ -115,11 +203,12 @@ def login((userid, passwd)):
         return 1
 
 def logout():
-    params = urllib.urlencode({'imageField.x':'44','imageField.y':'27'})
+    params = urllib.urlencode({'wlanuserip':ip,'wlanacname':'BAS_138','wlanacIp':'202.201.1.138',
+    'portalUrl':'','usertime':'3146400','imageField':''})
     headers = {"Content-type": "application/x-www-form-urlencoded", 
     "Accept": "text/plain"}
-    conn = httplib.HTTPConnection("1.1.1.1")
-    conn.request("POST", "/userout.magi", params, headers)
+    conn = httplib.HTTPConnection("202.201.1.140")
+    conn.request("POST", "/portalDisconnAction.do", params, headers)
     response = conn.getresponse()
     conn.close()
     if response.status == 200:
@@ -458,7 +547,7 @@ if __name__ == "__main__":
 
 
     start = Interface()
-    if loadconf()is 8:
+    if loadconf() is 8:
         start.Dialog(TITLE_ERR, ERR_CONF, icon = gtk.MESSAGE_ERROR)
         sys.exit(3)
     gtk.main()
