@@ -196,7 +196,7 @@ def login(userpass):
     'chal_id':'','chal_vector':'','seq_id':'','req_id':''})
     headers = {"Content-type": "application/x-www-form-urlencoded", 
     "Accept": "text/plain"}
-    conn = httplib.HTTPConnection("202.201.1.140")
+    conn = http.client.HTTPConnection("202.201.1.140")
     conn.request("POST", "/portalAuthAction.do", params, headers)
     response = conn.getresponse()
     data = response.read().decode('gb2312')
@@ -213,7 +213,7 @@ def logout():
     'portalUrl':'','usertime':'3146400','imageField':''})
     headers = {"Content-type": "application/x-www-form-urlencoded", 
     "Accept": "text/plain"}
-    conn = httplib.HTTPConnection("202.201.1.140")
+    conn = http.client.HTTPConnection("202.201.1.140")
     conn.request("POST", "/portalDisconnAction.do", params, headers)
     response = conn.getresponse()
     conn.close()
