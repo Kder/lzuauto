@@ -60,9 +60,7 @@ import urllib.parse
 import http.client
 import string
 import re
-
-
-########################################################################
+import random
 
 
 CHK_COUNT = 0
@@ -206,15 +204,32 @@ def login(userpass):
     result = re.findall(option, data)
     if len(result)>0:
         if result[0] == 'temp':
-            print(result)
+            # print(result)
             result = re.findall("var temp=('.+?')", data)
+            usertime = re.findall('''"usertime" value='(\d+)''', data)[0]
+            # print(usertime)
+            try:
+                with open('lzuauto.ini','w') as f:
+                    f.write(usertime)
+            except:
+                pass
         return result[0].strip("'")#.split('\'')[1]
     else:
         return 1
 
 def logout():
+    usertime = None
+    try:
+        with open('lzuauto.ini','r') as f:
+            usertime = f.readline().strip()
+    except:
+        pass
+    # x <- (0,180) y <- (0,50)
+    x = random.randrange(0,180)
+    y = random.randrange(0,50)
     params = urllib.parse.urlencode({'wlanuserip':ip,'wlanacname':'BAS_138','wlanacIp':'202.201.1.138',
-    'portalUrl':'','usertime':'3146400','imageField':''})
+    'portalUrl':'','usertime':usertime or '3146400','imageField.x':x,'imageField.y':y})
+    # print(params)
     headers = {"Content-type": "application/x-www-form-urlencoded", 
     "Accept": "text/plain"}
     conn = http.client.HTTPConnection("202.201.1.140")
