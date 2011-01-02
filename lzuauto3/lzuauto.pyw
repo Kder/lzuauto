@@ -84,7 +84,7 @@ class Application(tkinter.Frame):
         tkinter.messagebox.showinfo(title, data, icon=icon)
         
     def About(self, event=None):
-        self.Dialog(main.TITLE_ABOUT, "lzuauto %s.%s\n作者： ysjdxcn & Kder\n项目主页： http://code.google.com/p/lzuauto/ \nLicense : GPLv3" % (__version__, __revision__.split(':')[1][:-1].strip()))
+        self.Dialog(main.TITLE_ABOUT, "lzuauto %s.%s\n作者： ysjdxcn & Kder\n项目主页： http://code.google.com/p/lzuauto/ \nLicense : GPLv3" % (main.__version__, main.__revision__.split(':')[1][:-1].strip()))
         
     def Usage(self, event=None):
         #a class from idlelib

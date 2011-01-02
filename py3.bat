@@ -1,0 +1,1 @@
+7z a -xr!*.svn* -xr!*.pyc lzuauto-1.1.3.56-py3-src.7z lzuauto3
