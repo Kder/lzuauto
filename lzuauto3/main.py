@@ -83,7 +83,8 @@ TITLE_USAGE = '用法'
 TITLE_ERR = '错误'
 TITLE_FLOW = '流量查询'
 
-option = 'alert(.*?);'
+option = "alert\((.*?)\);"
+# option = "'\(.*?\)'"
 option1 = '<td bgcolor=\"FFFBF0\" align=\"center\" colspan=5>(.*?)MB'
 option2 = '<td bgcolor=\"FFFBF0\" align=\"center\" colspan=5>(.*?)Hours'
 option3 = '<font color=red>(.*?)</font>'
@@ -204,8 +205,11 @@ def login(userpass):
     #print data
     result = re.findall(option, data)
     if len(result)>0:
-        return result[0].split('\"')[1]
-    else :
+        if result[0] == 'temp':
+            print(result)
+            result = re.findall("var temp=('.+?')", data)
+        return result[0].strip("'")#.split('\'')[1]
+    else:
         return 1
 
 def logout():
