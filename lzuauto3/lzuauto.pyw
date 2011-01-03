@@ -148,14 +148,15 @@ class Application(tkinter.Frame):
         tv = TextViewer(self, main.TITLE_USAGE, __doc__)
 
     def createWidgets(self):
+        ft = tkinter.font.Font(family = '宋体',size = 9,weight = tkinter.font.NORMAL)
 
         # top = self.winfo_toplevel()
         # self.menuBar = Tkinter.Menu(top)
         # top["menu"] = self.menuBar
         self.menuBar = tkinter.Menu(self)
         self.master["menu"] = self.menuBar
-        self.subMenu1 = tkinter.Menu(self.menuBar, tearoff=0)
-        self.subMenu2 = tkinter.Menu(self.menuBar, tearoff=0)
+        self.subMenu1 = tkinter.Menu(self.menuBar, tearoff=0, font=ft)
+        self.subMenu2 = tkinter.Menu(self.menuBar, tearoff=0, font=ft)
         self.menuBar.add_cascade(label="文件(F)", menu=self.subMenu1, underline =3)
         self.subMenu1.add_command(label="退出(X)", command=self.quit, accelerator='Ctrl+Q', underline =3)
         self.menuBar.add_cascade(label="帮助(H)", menu=self.subMenu2, underline =3)
@@ -166,7 +167,6 @@ class Application(tkinter.Frame):
         button_label = ["登录外网", "查询流量", "退出外网", "退出程序"]
         actions = [self.login, self.checkflow, self.logout, self.quit]
         idx = 0
-        ft = tkinter.font.Font(family = '宋体',size = 9,weight = tkinter.font.NORMAL)
         for bdw in range(2):
             setattr(self, 'of%d' % bdw, tkinter.Frame(self, borderwidth=0))
             tkinter.Label(getattr(self, 'of%d' % bdw), text=None).pack(side=tkinter.LEFT)
