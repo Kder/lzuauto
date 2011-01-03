@@ -16,25 +16,15 @@ lzuauto - 兰大上网认证系统自动登录工具。
     
     Linux下需要的依赖：
     
-        python(py2.5以上，支持python3)
-        pygtk
+        python3
+        tcl/tk
         tesseract(ocr工具，主页 http://code.google.com/p/tesseract-ocr/ )
         各大发行版的源中应该都有上面的包，在Arch Linux和Gentoo Linux下测试通过。
         
     Windows下需要的依赖：
     
-        python-2.5.4.msi
-        pycairo-1.4.12-2.win32-py2.5.exe
-        pygobject-2.14.2-2.win32-py2.5.exe
-        pygtk-2.12.1-1.win32-py2.5.exe
-        
-    以上软件请到分别下列地址下载：
-    
-        http://www.python.org/
-        http://ftp.gnome.org/pub/GNOME/binaries/win32/pygtk/
-        http://ftp.gnome.org/pub/GNOME/binaries/win32/pycairo/
-        http://ftp.gnome.org/pub/GNOME/binaries/win32/pygobject/
-        
+        python3
+            下载：http://www.python.org
 '''
 
 __author__= 'ysjdxcn'

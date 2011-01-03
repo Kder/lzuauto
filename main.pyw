@@ -16,17 +16,17 @@ lzuauto - 兰大上网认证系统自动登录工具。
     
     Linux下需要的依赖：
     
-        python(py2.5以上)
-        pygtk
+        python(py2.6以上)
+        pygtk或者Tcl/tk
         tesseract(ocr工具，主页 http://code.google.com/p/tesseract-ocr/ )
         各大发行版的源中应该都有上面的包，在Arch Linux和Gentoo Linux下测试通过。
         
     Windows下需要的依赖：
     
-        python-2.5.4.msi【tk界面只依赖这一项，以下3个仅GTK版本需要】
-        pycairo-1.4.12-2.win32-py2.5.exe
-        pygobject-2.14.2-2.win32-py2.5.exe
-        pygtk-2.12.1-1.win32-py2.5.exe
+        python-2.6/2.7/Python3【tk界面只依赖这一项，以下3个仅GTK版本需要】
+        pycairo
+        pygobject
+        pygtk
         
     以上软件请到分别下列地址下载：
     
@@ -49,7 +49,7 @@ __status__ = 'Release'
 __projecturl__ = 'http://code.google.com/p/lzuauto/'
 
 __revision__ = "$Revision$"
-__version__ = '1.1.2'
+__version__ = '1.1.3'
 __date__ = '$Date: 2010-10-22 17:53:48 +0800 (星期五, 2010-10-22)$'
 
 import os
@@ -60,9 +60,7 @@ import urllib
 import httplib
 import string
 import re
-
-
-########################################################################
+import random
 
 
 CHK_COUNT = 0
@@ -83,7 +81,7 @@ TITLE_USAGE = '用法'
 TITLE_ERR = '错误'
 TITLE_FLOW = '流量查询'
 
-option = 'alert(.*?);'
+option = "alert\((.*?)\);"
 option1 = '<td bgcolor=\"FFFBF0\" align=\"center\" colspan=5>(.*?)MB'
 option2 = '<td bgcolor=\"FFFBF0\" align=\"center\" colspan=5>(.*?)Hours'
 option3 = '<font color=red>(.*?)</font>'
@@ -197,14 +195,34 @@ def login((userid, passwd)):
     conn.close()
     #print data
     result = re.findall(option, data)
+    # print(result)
     if len(result)>0:
-        return result[0].split('\"')[1].decode('gb2312')
+        if result[0] == 'temp':
+            result = re.findall("var temp=('.+?')", data)
+            usertime = re.findall('''"usertime" value='(\d+)''', data)[0]
+            # print(usertime)
+            try:
+                with open('lzuauto.ini','w') as f:
+                    f.write(usertime)
+            except:
+                pass
+        return result[0].strip("'").decode('gb2312')#.split('\'')[1]
+        
     else :
         return 1
 
 def logout():
+    usertime = None
+    try:
+        with open('lzuauto.ini','r') as f:
+            usertime = f.readline().strip()
+    except:
+        pass
+    # x <- (0,180) y <- (0,50)
+    x = random.randrange(0,180)
+    y = random.randrange(0,50)
     params = urllib.urlencode({'wlanuserip':ip,'wlanacname':'BAS_138','wlanacIp':'202.201.1.138',
-    'portalUrl':'','usertime':'3146400','imageField':''})
+    'portalUrl':'','usertime':usertime or '3146400','imageField.x':x,'imageField.y':y})
     headers = {"Content-type": "application/x-www-form-urlencoded", 
     "Accept": "text/plain"}
     conn = httplib.HTTPConnection("202.201.1.140")
