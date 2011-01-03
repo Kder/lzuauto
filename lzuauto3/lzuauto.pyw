@@ -30,7 +30,8 @@
 import sys
 import os
 import tkinter
-import tkinter.messagebox 
+import tkinter.messagebox
+import tkinter.font
 
 if os.name == 'posix':
     import py_compile
@@ -165,12 +166,13 @@ class Application(tkinter.Frame):
         button_label = ["登录外网", "查询流量", "退出外网", "退出程序"]
         actions = [self.login, self.checkflow, self.logout, self.quit]
         idx = 0
+        ft = tkinter.font.Font(family = '宋体',size = 9,weight = tkinter.font.NORMAL)
         for bdw in range(2):
             setattr(self, 'of%d' % bdw, tkinter.Frame(self, borderwidth=0))
             tkinter.Label(getattr(self, 'of%d' % bdw), text=None).pack(side=tkinter.LEFT)
             for i in range(2):
-                buttons.append(tkinter.Button(getattr(self, 'of%d' % bdw), text=button_label[idx], width=10,
-                       command=actions[idx]))
+                buttons.append(tkinter.Button(getattr(self, 'of%d' % bdw), 
+                    text=button_label[idx], width=10, command=actions[idx], font=ft))
                 buttons[idx].pack(side=tkinter.LEFT, padx=7, pady=7)
                 idx += 1
             getattr(self, 'of%d' % bdw).pack()

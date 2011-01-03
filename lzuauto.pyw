@@ -30,6 +30,7 @@
 import sys
 import os
 import Tkinter
+import tkFont
 import tkMessageBox 
 
 if os.name == 'posix':
@@ -85,7 +86,9 @@ class Application(Tkinter.Frame):
         tkMessageBox.showinfo(title, data, icon=icon)
         
     def About(self, event=None):
-        self.Dialog(main.TITLE_ABOUT, "lzuauto %s.%s\n作者： ysjdxcn & Kder\n项目主页： http://code.google.com/p/lzuauto/ \nLicense : GPLv3" % (__version__, __revision__.split(':')[1][:-1].strip()))
+        self.Dialog(main.TITLE_ABOUT, "lzuauto %s.%s\n作者： ysjdxcn & Kder\n\
+项目主页： http://code.google.com/p/lzuauto/ \nLicense : GPLv3" % \
+        (__version__, __revision__.split(':')[1][:-1].strip()))
         
     def Usage(self, event=None):
         '''display a usage dialog'''
@@ -112,14 +115,15 @@ class Application(Tkinter.Frame):
                 self.parent = parent
                 self.textView.focus_set()
                 #key bindings for this dialog
-                self.bind('<Return>',self.Ok) #dismiss dialog
+#                self.bind('<Return>',self.Ok) #dismiss dialog
                 self.bind('<Escape>',self.Ok) #dismiss dialog
                 self.textView.insert(0.0, text)
 #                self.textView.config(state=Tkinter.DISABLED)
                 self.withdraw()
                 self.update()
 #                x, y = (self.winfo_screenwidth() - self.winfo_reqwidth()) / 2, (self.winfo_screenheight() - self.winfo_reqheight()) / 2
-                x, y = (self.winfo_screenwidth() - self.winfo_width()) / 2, (self.winfo_screenheight() - self.winfo_height()) / 2
+                x, y = (self.winfo_screenwidth() - self.winfo_width()) / 2, \
+                (self.winfo_screenheight() - self.winfo_height()) / 2
 #                sys.stdout.write(str([self.winfo_width(),self.winfo_height()]))
                 self.geometry('+%d+%d' % (x, y))
                 self.deiconify()
@@ -167,17 +171,20 @@ class Application(Tkinter.Frame):
         button_label = ["登录外网", "查询流量", "退出外网", "退出程序"]
         actions = [self.login, self.checkflow, self.logout, self.quit]
         idx = 0
+        ft = tkFont.Font(family = '宋体',size = 9,weight = tkFont.NORMAL)
         for bdw in range(2):
             setattr(self, 'of%d' % bdw, Tkinter.Frame(self, borderwidth=0))
             Tkinter.Label(getattr(self, 'of%d' % bdw), text=None).pack(side=Tkinter.LEFT)
             for i in range(2):
-                buttons.append(Tkinter.Button(getattr(self, 'of%d' % bdw), text=button_label[idx], width=10,
-                       command=actions[idx]))
+                buttons.append(Tkinter.Button(getattr(self, 'of%d' % bdw),
+                 text=button_label[idx], width=10, command=actions[idx], font=ft))
                 buttons[idx].pack(side=Tkinter.LEFT, padx=7, pady=7)
                 idx += 1
             getattr(self, 'of%d' % bdw).pack()
         buttons[0].focus_set()
-            
+#        buttons[0].bind('<Return>',actions[0])
+        buttons[0].bind('<Enter>',actions[0])
+
     def Quit(self, event=None):
         self.destroy()
         root.destroy()
@@ -186,13 +193,14 @@ class Application(Tkinter.Frame):
         Tkinter.Frame.__init__(self, master)
         self.pack()
         self.createWidgets()
-        self.master.title('兰大上网认证系统自动登录工具')
+        self.master.title('兰大上网认证登录工具')
 #        self.master.withdraw()
 #        self.master.Popup()
         self.master.withdraw()
         self.master.update()
 #        self.master.overrideredirect(1)
-        self.x, self.y = (self.master.winfo_screenwidth() - self.master.winfo_width()) / 2, (self.master.winfo_screenheight() - self.master.winfo_height()) / 2
+        self.x, self.y = (self.master.winfo_screenwidth() - self.master.winfo_width()) / 2, \
+        (self.master.winfo_screenheight() - self.master.winfo_height()) / 2
 #        sys.stdout.write(str((x, y)))
         self.master.geometry('+%d+%d' % (self.x, self.y))
         self.master.deiconify()
