@@ -4,6 +4,7 @@ import sys
 import os
 from distutils.core import setup
 import py2exe
+import shutil
 import main
 import lzuauto
 
@@ -35,7 +36,7 @@ options_main = {'py2exe': {'bundle_files': 3,
             'inspect', 'pickle','unicodedata'],
             #'ascii' : True,
             #'dll_excludes' : ['msvcr71.dll'],
-            'dist_dir':'lzuauto',
+            'dist_dir':'lzuauto-gtk',
             }
 }
 
@@ -46,7 +47,7 @@ options_lzuauto = {'py2exe': {'bundle_files': 3,
             'pyreadline', 'logging', 'email', 'bz2', 'distutils', 'codegen',
             'inspect', 'pickle','unicodedata', 'gtk', 'pygtk', 'gobject', 'pygobject',
             'glib', 'atk','dsextras','cairo','gio','pango','pangocairo'],
-            'dist_dir':'lzuauto',
+            'dist_dir':'lzuauto-tk',
             }
 }
 
@@ -61,56 +62,69 @@ setup(name = 'lzuauto-gtk',
       options = options_main,
 )
 
-
-#begin to pack
-src_files = [
-'main.pyw',
-'lzuauto.pyw',
+base_files = [
 'conf.txt',
 'tesseract.exe',
 'leptonlib.dll',
 'tessdata',
+]
+
+#begin to pack
+src_files = base_files + [
+'main.pyw',
+'lzuauto.pyw',
 'setup.py',
 #'pack.py',
 ]
 src_args = ' '.join(src_files)
 
 try:
-    os.system('upx lzuauto/main.exe lzuauto/tcl85.dll lzuauto/tk85.dll \
-    lzuauto/python27.dll lzuauto/*.pyd')
+    for i in base_files:
+        for j in ['lzuauto-gtk', 'lzuauto-tk']:
+            if os.path.isdir(i):
+                if not os.path.isdir(j+os.sep+i):
+                    shutil.copytree(i,j+os.sep+i)
+            else:
+                shutil.copy(i,j)
+    os.system('upx lzuauto-gtk/*.pyd lzuauto-gtk/*.exe lzuauto-gtk/*.dll')
+    os.system('upx lzuauto-tk/*.pyd lzuauto-tk/*.exe lzuauto-tk/*.dll')
 
     os.system('7z a -t7z -xr!*.svn* lzuauto-%s-src.7z %s' % \
                 (main.__version__, src_args))
-except:
+    os.system('7z a -t7z -xr!*.svn* lzuauto-%s-win-gtk.7z lzuauto-gtk' % main.__version__)
+except Exception,e:
+    sys.stderr.write(str(e))
+    sys.stderr.write('Error.')
     sys.stderr.write('Please make sure upx and 7z are in system path.')
     sys.exit(-1)
 
-os.system('7z a -t7z -xr!*.svn* lzuauto-%s-win.7z lzuauto/main.exe \
-lzuauto/conf.txt lzuauto/tesseract.exe lzuauto/tessdata \
-lzuauto/leptonlib.dll' % main.__version__)
+# os.system('7z a -t7z -xr!*.svn* lzuauto-%s-win.7z lzuauto/main.exe \
+# lzuauto/conf.txt lzuauto/tesseract.exe lzuauto/tessdata \
+# lzuauto/leptonlib.dll' % main.__version__)
 
 tk_files = [
-'lzuauto/lzuauto.exe',
-'lzuauto/conf.txt',
-'lzuauto/python27.dll',
-'lzuauto/library.zip',
-'lzuauto/_socket.pyd',
-'lzuauto/_tkinter.pyd',
-'lzuauto/select.pyd',
-'lzuauto/tcl85.dll',
-'lzuauto/tk85.dll',
-'lzuauto/tesseract.exe',
-'lzuauto/leptonlib.dll',
-'lzuauto/tessdata',
-'lzuauto/tcl/tcl8.5/auto.tcl',
-'lzuauto/tcl/tcl8.5/init.tcl',
-'lzuauto/tcl/tcl8.5/tclIndex',
-'lzuauto/tcl/tk8.5/tclIndex',
-'lzuauto/tcl/tk8.5/*.tcl',
-'lzuauto/tcl/tk8.5/ttk',
+'lzuauto-tk/conf.txt',
+'lzuauto-tk/tesseract.exe',
+'lzuauto-tk/leptonlib.dll',
+'lzuauto-tk/tessdata',
+'lzuauto-tk/lzuauto.exe',
+'lzuauto-tk/python27.dll',
+'lzuauto-tk/library.zip',
+'lzuauto-tk/_ctypes.pyd',
+'lzuauto-tk/_socket.pyd',
+'lzuauto-tk/_tkinter.pyd',
+'lzuauto-tk/select.pyd',
+'lzuauto-tk/tcl85.dll',
+'lzuauto-tk/tk85.dll',
+'lzuauto-tk/tcl/tcl8.5/auto.tcl',
+'lzuauto-tk/tcl/tcl8.5/init.tcl',
+'lzuauto-tk/tcl/tcl8.5/tclIndex',
+'lzuauto-tk/tcl/tk8.5/tclIndex',
+'lzuauto-tk/tcl/tk8.5/*.tcl',
+'lzuauto-tk/tcl/tk8.5/ttk',
 ]
 
 tk_args = ' '.join(tk_files)
 
-os.system(r'7z a -t7z -xr!*.svn* lzuauto-%s-win-lite.7z %s' % \
+os.system(r'7z a -t7z -xr!*.svn* lzuauto-%s-win-tk.7z %s' % \
             (lzuauto.__version__, tk_args))
