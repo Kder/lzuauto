@@ -15,14 +15,14 @@
     
     Linux下面需要的依赖：
     
-        python(py2.5以上)
+        python(py2.6以上)
         tcl和tk
         tesseract(ocr工具，主页 http://code.google.com/p/tesseract-ocr/ ）
         各大发行版的源中应该都有上面的包，在Arch Linux和Gentoo Linux下测试通过。
         
     Windows下需要的依赖：
     
-        Python2.5以上，下载地址：http://www.python.org
+        Python2.6以上，下载地址：http://www.python.org
 
 '''
 
@@ -39,8 +39,8 @@ if os.name == 'posix':
 import main
 
 
-__version__ = '1.1.2'
-__revision__ = "$Revision$"
+__version__ = main.__version__
+__revision__ = main.__revision__
 __date__ = '$Date$'
 __author__= '$Author$'
 
@@ -215,4 +215,5 @@ if __name__ == "__main__":
     app.mainloop()
     # root.destroy()
 
+#$Id$
 #vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4

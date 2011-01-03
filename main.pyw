@@ -21,19 +21,14 @@ lzuauto - 兰大上网认证系统自动登录工具。
         tesseract(ocr工具，主页 http://code.google.com/p/tesseract-ocr/ )
         各大发行版的源中应该都有上面的包，在Arch Linux和Gentoo Linux下测试通过。
         
-    Windows下需要的依赖：
-    
-        python-2.6/2.7/Python3【tk界面只依赖这一项，以下3个仅GTK版本需要】
-        pycairo
-        pygobject
-        pygtk
+    Windows下： 
+        python2.6/2.7 【tk界面只依赖这一项】，或Python3（仅支持tk界面） http://www.python.org 
         
-    以上软件请到分别下列地址下载：
-    
-        http://www.python.org/
-        http://ftp.gnome.org/pub/GNOME/binaries/win32/pygtk/
-        http://ftp.gnome.org/pub/GNOME/binaries/win32/pycairo/
-        http://ftp.gnome.org/pub/GNOME/binaries/win32/pygobject/
+        以下4个仅GTK界面需要 
+            pycairo http://ftp.gnome.org/pub/GNOME/binaries/win32/pygtk/ 
+            pygobject http://ftp.gnome.org/pub/GNOME/binaries/win32/pycairo/ 
+            pygtk http://ftp.gnome.org/pub/GNOME/binaries/win32/pygobject/ 
+            GTK+(All-in-one bundles) http://www.gtk.org/download-windows.html
         
 '''
 

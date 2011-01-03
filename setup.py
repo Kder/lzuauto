@@ -26,12 +26,12 @@ lzuauto_exe = main_exe.copy()
 lzuauto_exe["script"] = 'lzuauto.pyw'
 lzuauto_exe["version"] = '%s.%s' % (lzuauto.__version__, lzuauto.__revision__.split(':')[1][:-1].strip())
 
-options_main = {'py2exe': {'bundle_files': 1,
+options_main = {'py2exe': {'bundle_files': 3,
             'optimize': 2,
             'compressed': 1,
             'includes':['atk','dsextras','cairo','gio','pango','pangocairo'],
             'excludes' : ['_ssl', '_hashlib', 'doctest', 'pdb', 'unittest', 'difflib',
-            'pyreadline', 'logging', 'email', 'ctypes', 'bz2', 'distutils', 'codegen',
+            'pyreadline', 'logging', 'email', 'bz2', 'distutils', 'codegen',
             'inspect', 'pickle','unicodedata'],
             #'ascii' : True,
             #'dll_excludes' : ['msvcr71.dll'],
@@ -43,7 +43,7 @@ options_lzuauto = {'py2exe': {'bundle_files': 3,
             'optimize': 2,
             'compressed': 1,
             'excludes' : ['_ssl', '_hashlib', 'doctest', 'pdb', 'unittest', 'difflib',
-            'pyreadline', 'logging', 'email', 'ctypes', 'bz2', 'distutils', 'codegen',
+            'pyreadline', 'logging', 'email', 'bz2', 'distutils', 'codegen',
             'inspect', 'pickle','unicodedata', 'gtk', 'pygtk', 'gobject', 'pygobject',
             'glib', 'atk','dsextras','cairo','gio','pango','pangocairo'],
             'dist_dir':'lzuauto',
@@ -77,7 +77,7 @@ src_args = ' '.join(src_files)
 
 try:
     os.system('upx lzuauto/main.exe lzuauto/tcl85.dll lzuauto/tk85.dll \
-    lzuauto/python26.dll lzuauto/*.pyd')
+    lzuauto/python27.dll lzuauto/*.pyd')
 
     os.system('7z a -t7z -xr!*.svn* lzuauto-%s-src.7z %s' % \
                 (main.__version__, src_args))
@@ -92,7 +92,7 @@ lzuauto/leptonlib.dll' % main.__version__)
 tk_files = [
 'lzuauto/lzuauto.exe',
 'lzuauto/conf.txt',
-'lzuauto/python26.dll',
+'lzuauto/python27.dll',
 'lzuauto/library.zip',
 'lzuauto/_socket.pyd',
 'lzuauto/_tkinter.pyd',
