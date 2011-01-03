@@ -268,7 +268,8 @@ def ocr(data):
             img_name = 'code.bmp'
         except:
             return 6
-    args = ['tesseract %s ocr' % img_name]
+    os.environ['TESSDATA_PREFIX'] = './'
+    args = ['tesseract %s ocr nobatch digits' % img_name]
     #~ print os.getcwd(),args
     proc = subprocess.Popen(args, shell=True)
     retcode = proc.wait()

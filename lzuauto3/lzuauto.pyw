@@ -15,14 +15,14 @@
     
     Linux下面需要的依赖：
     
-        python(py2.5以上，支持python3)
+        python3
         tcl和tk
         tesseract(ocr工具，主页 http://code.google.com/p/tesseract-ocr/ ）
         各大发行版的源中应该都有上面的包，在Arch Linux和Gentoo Linux下测试通过。
         
     Windows下需要的依赖：
     
-        Python2.5以上，下载地址：http://www.python.org
+        Python3，下载地址：http://www.python.org
 
 '''
 
