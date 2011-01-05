@@ -10,9 +10,10 @@ lzuauto - 兰大上网认证系统自动登录工具。
     
 使用方法
     
-    解压后，修改conf.txt，把自己的用户名密码填入。 运行 main.exe或main.pyw 即可。
+    解压后，第一次运行 main.exe（或main.pyw），会弹出对话框，把自己的账号密码填入，
+    点击“登录外网”即可。
     
-系统要求
+运行源码版的系统要求
     
     Linux下需要的依赖：
     
@@ -81,9 +82,21 @@ option1 = '<td bgcolor=\"FFFBF0\" align=\"center\" colspan=5>(.*?)MB'
 option2 = '<td bgcolor=\"FFFBF0\" align=\"center\" colspan=5>(.*?)Hours'
 option3 = '<font color=red>(.*?)</font>'
 
+# path0 = os.path.dirname(sys.path[0])
+path0 = sys.path[0]
+if os.path.isdir(sys.path[0]):
+    PROGRAM_PATH = path0
+else:
+    PROGRAM_PATH = os.path.dirname(path0)
+#    PROGRAM_PATH = os.path.join(path0, os.pardir)
+
+CONF = PROGRAM_PATH + os.sep + 'conf.txt'
+CONF2 = PROGRAM_PATH + os.sep + 'lzuauto.ini'
+
+
 def readconf():
-    if os.path.exists('conf.txt'):
-        f = open('conf.txt')
+    if os.path.exists(CONF):
+        f = open(CONF)
         userpass = f.readline().strip()
         userpass = string.split(userpass, maxsplit=1)
         f.close()
@@ -212,7 +225,7 @@ def login((userid, passwd)):
             usertime = re.findall('''"usertime" value='(\d+)''', data)[0]
             # print(usertime)
             try:
-                with open('lzuauto.ini','w') as f:
+                with open(CONF2,'w') as f:
                     f.write(usertime)
             except:
                 pass
@@ -224,7 +237,7 @@ def login((userid, passwd)):
 def logout():
     usertime = None
     try:
-        with open('lzuauto.ini','r') as f:
+        with open(CONF2,'r') as f:
             usertime = f.readline().strip()
     except:
         pass
@@ -516,7 +529,7 @@ if __name__ == "__main__":
             win = gtk.Window(gtk.WINDOW_TOPLEVEL)
             win.connect('destroy', lambda wid: gtk.main_quit())
             win.connect('delete_event', lambda a1,a2:gtk.main_quit())
-            win.set_title('兰州大学校园网工具')
+            win.set_title('兰州大学上网认证工具')
             win.set_size_request(240, 120)
             win.set_position(gtk.WIN_POS_CENTER)
 
@@ -636,13 +649,13 @@ if __name__ == "__main__":
         if response == gtk.RESPONSE_OK:
             userpass = (entry.get_text(), entry_pass.get_text())
             if '' not in userpass:
-                with open('conf.txt','w') as f:
+                with open(CONF,'w') as f:
                     f.write('%s %s' % userpass)
         dialog.destroy()
         return userpass
 
     start = Interface()
-    # if loadconf() is 8:
+    loadconf(getUserpass)
 
         # start.Dialog(TITLE_ERR, ERR_CONF, icon = gtk.MESSAGE_ERROR)
         # sys.exit(3)
