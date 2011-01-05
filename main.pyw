@@ -82,29 +82,25 @@ option2 = '<td bgcolor=\"FFFBF0\" align=\"center\" colspan=5>(.*?)Hours'
 option3 = '<font color=red>(.*?)</font>'
 
 def readconf():
-    f = open('conf.txt')
-    userpass = f.readline().strip()
-    userpass = string.split(userpass, maxsplit=1)
-    f.close()
-    print(userpass)
-    if isinstance(userpass, list) and len(userpass) > 1:
-        return userpass
+    if os.path.exists('conf.txt'):
+        f = open('conf.txt')
+        userpass = f.readline().strip()
+        userpass = string.split(userpass, maxsplit=1)
+        f.close()
+        print(userpass)
+        if isinstance(userpass, list) and len(userpass) > 1:
+            return userpass
     else:
         return 8
 
 def loadconf(getuserpass):
     try:
-        if not os.path.exists('conf.txt'):
+        userpass = readconf()
+        if userpass is 8 or userpass[0] == 'test@lzu.cn':
             return getuserpass(None)
-            # print('hi')
             # readconf()
         else:
-            userpass = readconf()
-            if userpass is 8 or userpass[0] == 'test@lzu.cn':
-                return getuserpass(None)
-                # readconf()
-            else:
-                return userpass
+            return userpass
     except:
         return 8
 
@@ -616,11 +612,10 @@ if __name__ == "__main__":
         entry_pass = gtk.Entry()
         entry_pass.set_visibility(False)
         
-        if os.path.exists('conf.txt'):
-            userpass = readconf()
-            if isinstance(userpass, list) and len(userpass) > 1:
-                entry.set_text(userpass[0])
-                entry_pass.set_text(userpass[1])
+        userpass = readconf()
+        if userpass is not 8:
+            entry.set_text(userpass[0])
+            entry_pass.set_text(userpass[1])
         #allow the user to press enter to do ok
         entry_pass.connect("activate", responseToDialog, dialog, gtk.RESPONSE_OK)
         #create a horizontal box to pack the entry and a label
