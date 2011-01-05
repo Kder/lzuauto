@@ -81,14 +81,33 @@ option1 = '<td bgcolor=\"FFFBF0\" align=\"center\" colspan=5>(.*?)MB'
 option2 = '<td bgcolor=\"FFFBF0\" align=\"center\" colspan=5>(.*?)Hours'
 option3 = '<font color=red>(.*?)</font>'
 
-def loadconf():
+def readconf():
+    f = open('conf.txt')
+    userpass = f.readline().strip()
+    userpass = string.split(userpass, maxsplit=1)
+    f.close()
+    print(userpass)
+    if isinstance(userpass, list) and len(userpass) > 1:
+        return userpass
+    else:
+        return 8
+
+def loadconf(getuserpass):
     try:
-        f = open('conf.txt')
-        userid, passwd = string.split(f.readline().strip(), maxsplit=1)
-        f.close()
+        if not os.path.exists('conf.txt'):
+            return getuserpass(None)
+            # print('hi')
+            # readconf()
+        else:
+            userpass = readconf()
+            if userpass is 8 or userpass[0] == 'test@lzu.cn':
+                return getuserpass(None)
+                # readconf()
+            else:
+                return userpass
     except:
         return 8
-    return userid, passwd
+
 
 # Get the IP address of local machine
 # code from:
@@ -400,6 +419,9 @@ if __name__ == "__main__":
           <menu action="File">
             <menuitem action="Quit"/>
           </menu>
+          <menu action="Settings">
+            <menuitem action="Userpass"/>
+          </menu>
           <menu action="Help">
             <menuitem action="About"/>
             <menuitem action="Usage"/>
@@ -409,9 +431,11 @@ if __name__ == "__main__":
         
         def login(self, widget, data=None):
             #print 'login'
-            if loadconf()== 8:
-                start.Dialog(TITLE_ERR, ERR_CONF, icon = gtk.MESSAGE_ERROR)
-            result = login(loadconf())
+            userpass = loadconf(getUserpass)
+            # if userpass == 8:
+                # start.Dialog(TITLE_ERR, ERR_CONF, icon = gtk.MESSAGE_ERROR)
+                # getUserpass(None)
+            result = login(userpass)
             if result is 1 or 'M)' in result:
                 self.Dialog(TITLE_LOGIN, MSG_LOGIN % result)
             else:
@@ -425,9 +449,10 @@ if __name__ == "__main__":
                 self.logout
 
         def checkflow(self, widget, data=None):
-            if loadconf()== 8:
-                start.Dialog(TITLE_ERR, ERR_CONF, icon = gtk.MESSAGE_ERROR)
-            flow = checkflow(loadconf())
+            userpass = loadconf(getUserpass)
+            # if userpass == 8:
+                # start.Dialog(TITLE_ERR, ERR_CONF, icon = gtk.MESSAGE_ERROR)
+            flow = checkflow(userpass)
             if type(flow)is type(tuple()):
                 self.Dialog(TITLE_FLOW, MSG_FLOW % flow)
             elif type(flow)is type(unicode()):
@@ -487,13 +512,16 @@ if __name__ == "__main__":
             textview.show()
             dialog.run()
             dialog.destroy()
+
+
+            
             
         def __init__(self):
             win = gtk.Window(gtk.WINDOW_TOPLEVEL)
             win.connect('destroy', lambda wid: gtk.main_quit())
             win.connect('delete_event', lambda a1,a2:gtk.main_quit())
             win.set_title('兰州大学校园网工具')
-            win.set_size_request(200, 100)
+            win.set_size_request(240, 120)
             win.set_position(gtk.WIN_POS_CENTER)
 
             main_vbox = gtk.VBox(False, 0)
@@ -511,7 +539,10 @@ if __name__ == "__main__":
                                        None, TITLE_ABOUT, self.About),
                                       ('Usage', gtk.STOCK_INFO, '用法(_U)',
                                        None, TITLE_USAGE, self.Usage),
+                                      ('Userpass', gtk.STOCK_DIALOG_AUTHENTICATION, '账号(_U)',
+                                       None, TITLE_USAGE, getUserpass),
                                      ('File', gtk.STOCK_FILE, '文件(_F)'),
+                                     ('Settings', gtk.STOCK_PROPERTIES, '设置(_S)'),
                                      ('Help', gtk.STOCK_HELP, '帮助(_H)'),
                                      ])
             actiongroup.get_action('Quit').set_property('short-label', '_Quit')
@@ -539,13 +570,13 @@ if __name__ == "__main__":
     #        main_vbox.pack_start(button3, True, True, 0)
     #        main_vbox.pack_start(button4, True, True, 0)
 
-            main_hbox1.pack_start(button[0], True, True, 3)
-            main_hbox1.pack_start(button[2], True, True, 3)
-            main_hbox2.pack_start(button[1], True, True, 3)
-            main_hbox2.pack_start(button[3], True, True, 3)
+            main_hbox1.pack_start(button[0], True, True, 10)
+            main_hbox1.pack_start(button[2], True, True, 10)
+            main_hbox2.pack_start(button[1], True, True, 10)
+            main_hbox2.pack_start(button[3], True, True, 10)
             
-            main_vbox.pack_start(main_hbox1, True, True, 3)
-            main_vbox.pack_start(main_hbox2, True, True, 3)
+            main_vbox.pack_start(main_hbox1, True, True, 10)
+            main_vbox.pack_start(main_hbox2, True, True, 10)
             
     #        table = gtk.Table(2, 2, True)
     #        table.set_size_request(190, 110)
@@ -559,11 +590,67 @@ if __name__ == "__main__":
             win.modify_font(pango.FontDescription("sans 9"))
             win.show_all()
 
+    def getUserpass(widget):
+        def responseToDialog(entry, dialog, response):
+            dialog.response(response)
+        #base this on a message dialog
+        dialog = gtk.MessageDialog(
+            None,
+            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
+            gtk.MESSAGE_QUESTION,
+            gtk.BUTTONS_OK_CANCEL,
+            None)
+        
+        dialog.set_default_response(gtk.RESPONSE_OK)
+        
+        # dialog.set_markup('请输入 <b>账号和密码</b>:')
+        dialog.set_markup('请输入账号和密码:')
+        # dialog.format_secondary_markup("<i>只需首次运行和要修改密码时输入</i>")
+        dialog.format_secondary_markup("(只需首次运行和要修改密码时输入)")
+        
+        
+        
+        #create the text input field
+        entry = gtk.Entry()
+        
+        entry_pass = gtk.Entry()
+        entry_pass.set_visibility(False)
+        
+        if os.path.exists('conf.txt'):
+            userpass = readconf()
+            if isinstance(userpass, list) and len(userpass) > 1:
+                entry.set_text(userpass[0])
+                entry_pass.set_text(userpass[1])
+        #allow the user to press enter to do ok
+        entry_pass.connect("activate", responseToDialog, dialog, gtk.RESPONSE_OK)
+        #create a horizontal box to pack the entry and a label
+        hbox1 = gtk.HBox()
+        hbox2 = gtk.HBox()
+        hbox1.pack_start(gtk.Label("账号:"), False, 5, 5)
+        hbox1.pack_end(entry)
+        hbox2.pack_start(gtk.Label("密码:"), False, 5, 5)
+        hbox2.pack_end(entry_pass)
+        #some secondary text
+        #add it and show it
+        dialog.vbox.pack_start(hbox1, True, True, 0)
+        dialog.vbox.pack_start(hbox2, True, True, 0)
+        dialog.set_position(gtk.WIN_POS_CENTER)
+        dialog.show_all()
+        #go go go
+        response = dialog.run()
+        if response == gtk.RESPONSE_OK:
+            userpass = (entry.get_text(), entry_pass.get_text())
+            if '' not in userpass:
+                with open('conf.txt','w') as f:
+                    f.write('%s %s' % userpass)
+        dialog.destroy()
+        return userpass
 
     start = Interface()
-    if loadconf() is 8:
-        start.Dialog(TITLE_ERR, ERR_CONF, icon = gtk.MESSAGE_ERROR)
-        sys.exit(3)
+    # if loadconf() is 8:
+
+        # start.Dialog(TITLE_ERR, ERR_CONF, icon = gtk.MESSAGE_ERROR)
+        # sys.exit(3)
     gtk.main()
 
 #vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4
