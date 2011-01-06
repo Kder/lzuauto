@@ -11,7 +11,7 @@
     
     解压后，修改conf.txt，把自己的用户名密码填入。 运行 lzuauto.exe或lzuauto.pyw 就会出来主界面。
     
-系统要求
+运行源码版的系统要求
     
     Linux下面需要的依赖：
     
@@ -48,10 +48,12 @@ __author__= '$Author$'
 
 class Application(Tkinter.Frame):
 
-    def login(self):
-        if main.loadconf() is 8:
-            self.Dialog(main.TITLE_ERR, main.ERR_CONF, 'error')
-        result = main.login(main.loadconf())
+    def login(self, event=None):
+        # if main.loadconf() is 8:
+            # self.Dialog(main.TITLE_ERR, main.ERR_CONF, 'error')
+        userpass = main.loadconf(getUserpass)
+        print(type(userpass))
+        result = main.login(userpass)
         if result is 1 or 'M)' in result:
             self.Dialog(main.TITLE_LOGIN, main.MSG_LOGIN.decode('utf-8')
              % result)
@@ -65,9 +67,10 @@ class Application(Tkinter.Frame):
             self.logout
 
     def checkflow(self):
-        if main.loadconf() is 8:
-            self.Dialog(main.TITLE_ERR, main.ERR_CONF, 'error')
-        flow = main.checkflow(main.loadconf())
+        # if main.loadconf() is 8:
+            # self.Dialog(main.TITLE_ERR, main.ERR_CONF, 'error')
+        userpass = main.loadconf(getUserpass)
+        flow = main.checkflow(userpass)
         if type(flow) is type(tuple()):
             self.Dialog(main.TITLE_FLOW, main.MSG_FLOW % flow)
         elif type(flow) is type(unicode()):
@@ -170,7 +173,7 @@ class Application(Tkinter.Frame):
 
         buttons = list()
         button_label = ["登录外网", "查询流量", "退出外网", "退出程序"]
-        actions = [self.login, self.checkflow, self.logout, self.quit]
+        actions = [self.login, self.checkflow, self.logout, self.Quit]
         idx = 0
         for bdw in range(2):
             setattr(self, 'of%d' % bdw, Tkinter.Frame(self, borderwidth=0))
@@ -182,8 +185,9 @@ class Application(Tkinter.Frame):
                 idx += 1
             getattr(self, 'of%d' % bdw).pack()
         buttons[0].focus_set()
-#        buttons[0].bind('<Return>',actions[0])
-        buttons[0].bind('<Enter>',actions[0])
+        for i in range(4):
+            buttons[i].bind('<Key-Return>',actions[i])
+        # buttons[0].bind('<Enter>',actions[0])
 
     def Quit(self, event=None):
         self.destroy()
@@ -191,6 +195,8 @@ class Application(Tkinter.Frame):
         
     def __init__(self, master):
         Tkinter.Frame.__init__(self, master)
+        global userpass
+
         self.pack()
         self.createWidgets()
         self.master.title('兰大上网认证登录工具')
@@ -213,13 +219,67 @@ class Application(Tkinter.Frame):
         # self.grab_set()
         # self.protocol("WM_DELETE_WINDOW", self.Ok)
         # self.wait_window()
+        userpass = getUserpass()
+
+class MyDialog(Tkinter.Frame):
+    def __init__(self, master=None):
+        global userpass
+        Tkinter.Frame.__init__(self, master)
+        self.v1 = Tkinter.StringVar()
+        self.v2 = Tkinter.StringVar()
+        l1=Tkinter.Label(self,text="账号:")
+        l1.grid(row=0,column=0)
+        self.e1=Tkinter.Entry(self, textvariable=self.v1)
+        self.e1.grid(row=0,column=1)
+        l2=Tkinter.Label(self,text="密码:")
+        l2.grid(row=1,column=0)
+        self.e2=Tkinter.Entry(self,show="*", textvariable=self.v2)
+        self.e2.grid(row=1,column=1)
+        b1=Tkinter.Button(self,text='确定', command=self.Ok)
+        b1.grid(row=2,column=0)
+        b2=Tkinter.Button(self,text='取消', command=self.Cancel)
+        b2.grid(row=2,column=1)
+        
+        self.userpass = main.readconf()
+        print(self.userpass)
+        if self.userpass is not 8:
+            self.v1.set(self.userpass[0])
+            self.v2.set(self.userpass[1])
+        userpass = self.userpass
+        
+        self.pack()
+
+    def Ok(self):
+        self.userpass = (self.v1.get(), self.v2.get())
+        if '' not in self.userpass:
+            with open(main.CONF,'w') as f:
+                f.write('%s %s' % self.userpass)
+        userpass = self.userpass
+        self.destroy()
+        self.master.destroy()
+
+    def Cancel(self):
+        self.destroy()
+        self.master.destroy()
+        
+def getUserpass(evt=None):
+    root2=Tkinter.Tk()
+    myapp = MyDialog(root2)
+    myapp.master.title("请输入账号密码：")
+    # myapp.master.maxsize(1000, 400)
+    myapp.mainloop()
+    try:
+        root2.destroy()
+    except:
+        pass
+    return userpass
         
 if __name__ == "__main__":
     root = Tkinter.Tk()
     app = Application(master=root)
-    if main.loadconf() is 8:
-        app.Dialog(main.TITLE_ERR, main.ERR_CONF, 'error')
-        sys.exit(3)
+    # if main.loadconf() is 8:
+        # app.Dialog(main.TITLE_ERR, main.ERR_CONF, 'error')
+        # sys.exit(3)
     app.mainloop()
     # root.destroy()
 
