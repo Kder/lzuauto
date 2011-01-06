@@ -196,6 +196,7 @@ class Application(Tkinter.Frame):
         self.destroy()
         # root.destroy()
         self.master.destroy()
+        sys.exit()
         
     def __init__(self, master):
         Tkinter.Frame.__init__(self, master)
@@ -269,6 +270,7 @@ class MyDialog(Tkinter.Frame):
         self.pack()
 
     def Ok(self,evt=None):
+        global userpass
         self.userpass = (self.e1.get(), self.e2.get())
         if '' not in self.userpass:
             with open(main.CONF,'w') as f:
@@ -282,6 +284,7 @@ class MyDialog(Tkinter.Frame):
         self.master.destroy()
         
 def getUserpass(evt=None):
+    global userpass
     root2=Tkinter.Tk()
     myapp = MyDialog(root2)
     myapp.master.title("请输入账号密码：")

@@ -114,7 +114,8 @@ def loadconf(getuserpass):
             # readconf()
         else:
             return userpass
-    except:
+    except Exception,e:
+        print(e)
         return 8
 
 
