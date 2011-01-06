@@ -165,11 +165,14 @@ class Application(Tkinter.Frame):
         self.master["menu"] = self.menuBar
         self.subMenu1 = Tkinter.Menu(self.menuBar, tearoff=0, font=ft)
         self.subMenu2 = Tkinter.Menu(self.menuBar, tearoff=0, font=ft)
+        self.subMenu3 = Tkinter.Menu(self.menuBar, tearoff=0, font=ft)
         self.menuBar.add_cascade(label="文件(F)", menu=self.subMenu1, underline =3)
         self.subMenu1.add_command(label="退出(X)", command=self.quit, accelerator='Ctrl+Q', underline =3)
-        self.menuBar.add_cascade(label="帮助(H)", menu=self.subMenu2, underline =3)
-        self.subMenu2.add_command(label="关于(A)", command=self.About, underline =3)
-        self.subMenu2.add_command(label="用法(U)", command=self.Usage, accelerator='F1', underline =3)
+        self.menuBar.add_cascade(label="设置(S)", menu=self.subMenu2, underline =3)
+        self.subMenu2.add_command(label="账号(A)", command=getUserpass, underline =3)
+        self.menuBar.add_cascade(label="帮助(H)", menu=self.subMenu3, underline =3)
+        self.subMenu3.add_command(label="关于(A)", command=self.About, underline =3)
+        self.subMenu3.add_command(label="用法(U)", command=self.Usage, accelerator='F1', underline =3)
 
         buttons = list()
         button_label = ["登录外网", "查询流量", "退出外网", "退出程序"]
@@ -191,7 +194,8 @@ class Application(Tkinter.Frame):
 
     def Quit(self, event=None):
         self.destroy()
-        root.destroy()
+        # root.destroy()
+        self.master.destroy()
         
     def __init__(self, master):
         Tkinter.Frame.__init__(self, master)
@@ -219,7 +223,6 @@ class Application(Tkinter.Frame):
         # self.grab_set()
         # self.protocol("WM_DELETE_WINDOW", self.Ok)
         # self.wait_window()
-        userpass = getUserpass()
 
 class MyDialog(Tkinter.Frame):
     def __init__(self, master=None):
@@ -235,6 +238,8 @@ class MyDialog(Tkinter.Frame):
         l2.grid(row=1,column=0)
         self.e2=Tkinter.Entry(self,show="*", textvariable=self.v2)
         self.e2.grid(row=1,column=1)
+        self.e2.bind('<Key-Return>', self.Ok)
+        self.e1.focus_set()
         b1=Tkinter.Button(self,text='确定', command=self.Ok)
         b1.grid(row=2,column=0)
         b2=Tkinter.Button(self,text='取消', command=self.Cancel)
@@ -243,18 +248,32 @@ class MyDialog(Tkinter.Frame):
         self.userpass = main.readconf()
         print(self.userpass)
         if self.userpass is not 8:
-            self.v1.set(self.userpass[0])
-            self.v2.set(self.userpass[1])
+            # self.v1.set(self.userpass[0])
+            # self.v2.set(self.userpass[1])
+            self.e1.insert(0,self.userpass[0])
+            self.e1.select_range(0,Tkinter.END)
+            self.e2.insert(0,self.userpass[1])
         userpass = self.userpass
+
+        self.master.withdraw()
+        self.master.update()
+#        self.master.overrideredirect(1)
+        self.x, self.y = (self.master.winfo_screenwidth() - self.master.winfo_width()) / 2, \
+        (self.master.winfo_screenheight() - self.master.winfo_height()) / 2
+#        sys.stdout.write(str((x, y)))
+        self.master.geometry('+%d+%d' % (self.x, self.y))
+        self.master.deiconify()
+        self.master.update()
+
         
         self.pack()
 
-    def Ok(self):
-        self.userpass = (self.v1.get(), self.v2.get())
+    def Ok(self,evt=None):
+        self.userpass = (self.e1.get(), self.e2.get())
         if '' not in self.userpass:
             with open(main.CONF,'w') as f:
                 f.write('%s %s' % self.userpass)
-        userpass = self.userpass
+            userpass = self.userpass
         self.destroy()
         self.master.destroy()
 
@@ -270,6 +289,7 @@ def getUserpass(evt=None):
     myapp.mainloop()
     try:
         root2.destroy()
+        # myapp.destroy()
     except:
         pass
     return userpass
@@ -280,7 +300,9 @@ if __name__ == "__main__":
     # if main.loadconf() is 8:
         # app.Dialog(main.TITLE_ERR, main.ERR_CONF, 'error')
         # sys.exit(3)
+    userpass = main.loadconf(getUserpass)
     app.mainloop()
+    
     # root.destroy()
 
 #$Id$
