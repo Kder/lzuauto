@@ -40,7 +40,7 @@ if os.name == 'posix':
 import main
 
 
-__version__ = '1.1.2'
+__version__ = '1.2.0'
 __revision__ = "$Revision$"
 __date__ = '$Date$'
 __author__= '$Author$'
@@ -156,11 +156,14 @@ class Application(tkinter.Frame):
         self.master["menu"] = self.menuBar
         self.subMenu1 = tkinter.Menu(self.menuBar, tearoff=0, font=ft)
         self.subMenu2 = tkinter.Menu(self.menuBar, tearoff=0, font=ft)
+        self.subMenu3 = tkinter.Menu(self.menuBar, tearoff=0, font=ft)
         self.menuBar.add_cascade(label="文件(F)", menu=self.subMenu1, underline =3)
         self.subMenu1.add_command(label="退出(X)", command=self.quit, accelerator='Ctrl+Q', underline =3)
-        self.menuBar.add_cascade(label="帮助(H)", menu=self.subMenu2, underline =3)
-        self.subMenu2.add_command(label="关于(A)", command=self.About, underline =3)
-        self.subMenu2.add_command(label="用法(U)", command=self.Usage, accelerator='F1', underline =3)
+        self.menuBar.add_cascade(label="设置(S)", menu=self.subMenu2, underline =3)
+        self.subMenu2.add_command(label="账号(A)", command=getUserpass, underline =3)
+        self.menuBar.add_cascade(label="帮助(H)", menu=self.subMenu3, underline =3)
+        self.subMenu3.add_command(label="关于(A)", command=self.About, underline =3)
+        self.subMenu3.add_command(label="用法(U)", command=self.Usage, accelerator='F1', underline =3)
 
         buttons = list()
         button_label = ["登录外网", "查询流量", "退出外网", "退出程序"]
@@ -176,7 +179,9 @@ class Application(tkinter.Frame):
                 idx += 1
             getattr(self, 'of%d' % bdw).pack()
         buttons[0].focus_set()
-            
+        for i in range(4):
+            buttons[i].bind('<Key-Return>',actions[i])
+
     def Quit(self, event=None):
         self.destroy()
         root.destroy()
