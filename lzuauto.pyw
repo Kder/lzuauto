@@ -52,7 +52,7 @@ class Application(Tkinter.Frame):
         # if main.loadconf() is 8:
             # self.Dialog(main.TITLE_ERR, main.ERR_CONF, 'error')
         userpass = main.loadconf(getUserpass)
-        print(type(userpass))
+        # print(type(userpass))
         result = main.login(userpass)
         if result is 1 or 'M)' in result:
             self.Dialog(main.TITLE_LOGIN, main.MSG_LOGIN.decode('utf-8')
@@ -247,7 +247,6 @@ class MyDialog(Tkinter.Frame):
         b2.grid(row=2,column=1)
         
         self.userpass = main.readconf()
-        print(self.userpass)
         if self.userpass is not 8:
             # self.v1.set(self.userpass[0])
             # self.v2.set(self.userpass[1])
@@ -265,7 +264,6 @@ class MyDialog(Tkinter.Frame):
         self.master.geometry('+%d+%d' % (self.x, self.y))
         self.master.deiconify()
         self.master.update()
-
         
         self.pack()
 
@@ -278,10 +276,12 @@ class MyDialog(Tkinter.Frame):
             userpass = self.userpass
         self.destroy()
         self.master.destroy()
+        self.quit()
 
     def Cancel(self):
         self.destroy()
         self.master.destroy()
+        self.quit()
         
 def getUserpass(evt=None):
     global userpass
@@ -290,11 +290,7 @@ def getUserpass(evt=None):
     myapp.master.title("请输入账号密码：")
     # myapp.master.maxsize(1000, 400)
     myapp.mainloop()
-    try:
-        root2.destroy()
-        # myapp.destroy()
-    except:
-        pass
+    # print(userpass,'g')
     return userpass
         
 if __name__ == "__main__":

@@ -45,7 +45,7 @@ __status__ = 'Release'
 __projecturl__ = 'http://code.google.com/p/lzuauto/'
 
 __revision__ = "$Revision$"
-__version__ = '1.1.3'
+__version__ = '1.2.0'
 __date__ = '$Date: 2010-10-22 17:53:48 +0800 (星期五, 2010-10-22)$'
 
 import os
@@ -100,7 +100,7 @@ def readconf():
         userpass = f.readline().strip()
         userpass = string.split(userpass, maxsplit=1)
         f.close()
-        print(userpass)
+        # print(userpass)
         if isinstance(userpass, list) and len(userpass) > 1:
             return userpass
     else:
@@ -110,10 +110,9 @@ def loadconf(getuserpass):
     try:
         userpass = readconf()
         if userpass is 8 or userpass[0] == 'test@lzu.cn':
-            return getuserpass(None)
-            # readconf()
-        else:
-            return userpass
+            userpass = getuserpass(None)
+            # print(userpass,'l')
+        return userpass
     except Exception,e:
         print(e)
         return 8
