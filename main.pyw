@@ -295,7 +295,7 @@ def ocr(data):
         except:
             return 6
     os.environ['TESSDATA_PREFIX'] = PROGRAM_PATH + os.sep
-    args = ['%stesseract %s ocr nobatch digits' % (PROGRAM_PATH + os.sep, img_name)]
+    args = [PROGRAM_PATH + os.sep + 'tesseract', img_name, 'ocr', 'nobatch', 'digits']
     #~ print os.getcwd(),args
     proc = subprocess.Popen(args, shell=True)
     retcode = proc.wait()
