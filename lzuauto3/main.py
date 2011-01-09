@@ -76,12 +76,23 @@ option = "alert\((.*?)\);"
 option1 = '<td bgcolor=\"FFFBF0\" align=\"center\" colspan=5>(.*?)MB'
 option2 = '<td bgcolor=\"FFFBF0\" align=\"center\" colspan=5>(.*?)Hours'
 option3 = '<font color=red>(.*?)</font>'
+# path0 = os.path.dirname(sys.path[0])
+path0 = sys.path[0]
+if os.path.isdir(sys.path[0]):
+    PROGRAM_PATH = path0
+else:
+    PROGRAM_PATH = os.path.dirname(path0)
+#    PROGRAM_PATH = os.path.join(path0, os.pardir)
+
+CONF = PROGRAM_PATH + os.sep + 'conf.txt'
+CONF2 = PROGRAM_PATH + os.sep + 'lzuauto.ini'
+
 
 def readconf():
     if os.path.exists(CONF):
         f = open(CONF)
         userpass = f.readline().strip()
-        userpass = string.split(userpass, maxsplit=1)
+        userpass = re.split('\s+', userpass, maxsplit=1)
         f.close()
         # print(userpass)
         if isinstance(userpass, list) and len(userpass) > 1:
