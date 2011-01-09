@@ -49,9 +49,9 @@ __author__= '$Author$'
 class Application(tkinter.Frame):
 
     def login(self):
-        if main.loadconf() is 8:
-            self.Dialog(main.TITLE_ERR, main.ERR_CONF, 'error')
-        result = main.login(main.loadconf())
+        userpass = main.loadconf(getUserpass)
+        # print(type(userpass))
+        result = main.login(userpass)
         if result is 1 or 'M)' in result:
             self.Dialog(main.TITLE_LOGIN, main.MSG_LOGIN % result)
         else:
@@ -64,9 +64,8 @@ class Application(tkinter.Frame):
             self.logout
 
     def checkflow(self):
-        if main.loadconf() is 8:
-            self.Dialog(main.TITLE_ERR, main.ERR_CONF, 'error')
-        flow = main.checkflow(main.loadconf())
+        userpass = main.loadconf(getUserpass)
+        flow = main.checkflow(userpass)
         if type(flow) is type(tuple()):
             self.Dialog(main.TITLE_FLOW, main.MSG_FLOW % flow)
         elif type(flow) is type(str()):
@@ -151,7 +150,7 @@ class Application(tkinter.Frame):
         ft = tkinter.font.Font(family = '宋体',size = 9,weight = tkinter.font.NORMAL)
 
         # top = self.winfo_toplevel()
-        # self.menuBar = Tkinter.Menu(top)
+        # self.menuBar = tkinter.Menu(top)
         # top["menu"] = self.menuBar
         self.menuBar = tkinter.Menu(self)
         self.master["menu"] = self.menuBar
@@ -205,13 +204,80 @@ class Application(tkinter.Frame):
         # self.grab_set()
         # self.protocol("WM_DELETE_WINDOW", self.Ok)
         # self.wait_window()
+
+class MyDialog(tkinter.Frame):
+    def __init__(self, master=None):
+        global userpass
+        tkinter.Frame.__init__(self, master)
+        self.v1 = tkinter.StringVar()
+        self.v2 = tkinter.StringVar()
+        l1=tkinter.Label(self,text="账号:")
+        l1.grid(row=0,column=0)
+        self.e1=tkinter.Entry(self, textvariable=self.v1)
+        self.e1.grid(row=0,column=1)
+        l2=tkinter.Label(self,text="密码:")
+        l2.grid(row=1,column=0)
+        self.e2=tkinter.Entry(self,show="*", textvariable=self.v2)
+        self.e2.grid(row=1,column=1)
+        self.e2.bind('<Key-Return>', self.Ok)
+        self.e1.focus_set()
+        b1=tkinter.Button(self,text='确定', command=self.Ok)
+        b1.grid(row=2,column=0)
+        b2=tkinter.Button(self,text='取消', command=self.Cancel)
+        b2.grid(row=2,column=1)
+        
+        self.userpass = main.readconf()
+        if self.userpass is not 8:
+            # self.v1.set(self.userpass[0])
+            # self.v2.set(self.userpass[1])
+            self.e1.insert(0,self.userpass[0])
+            self.e1.select_range(0,tkinter.END)
+            self.e2.insert(0,self.userpass[1])
+        userpass = self.userpass
+
+        self.master.withdraw()
+        self.master.update()
+#        self.master.overrideredirect(1)
+        self.x, self.y = (self.master.winfo_screenwidth() - self.master.winfo_width()) / 2, \
+        (self.master.winfo_screenheight() - self.master.winfo_height()) / 2
+#        sys.stdout.write(str((x, y)))
+        self.master.geometry('+%d+%d' % (self.x, self.y))
+        self.master.deiconify()
+        self.master.update()
+        
+        self.pack()
+
+    def Ok(self,evt=None):
+        global userpass
+        self.userpass = (self.e1.get(), self.e2.get())
+        if '' not in self.userpass:
+            with open(main.CONF,'w') as f:
+                f.write('%s %s' % self.userpass)
+            userpass = self.userpass
+        self.destroy()
+        self.master.destroy()
+        self.quit()
+
+    def Cancel(self):
+        self.destroy()
+        self.master.destroy()
+        self.quit()
+        
+def getUserpass(evt=None):
+    global userpass
+    root2=tkinter.Tk()
+    myapp = MyDialog(root2)
+    myapp.master.title("请输入账号密码：")
+    # myapp.master.maxsize(1000, 400)
+    myapp.mainloop()
+    # print(userpass,'g')
+    return userpass
+        
         
 if __name__ == "__main__":
     root = tkinter.Tk()
     app = Application(master=root)
-    if main.loadconf() is 8:
-        app.Dialog(main.TITLE_ERR, main.ERR_CONF, 'error')
-        sys.exit(3)
+    userpass = main.loadconf(getUserpass)
     app.mainloop()
     # root.destroy()
 

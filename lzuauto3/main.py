@@ -77,15 +77,28 @@ option1 = '<td bgcolor=\"FFFBF0\" align=\"center\" colspan=5>(.*?)MB'
 option2 = '<td bgcolor=\"FFFBF0\" align=\"center\" colspan=5>(.*?)Hours'
 option3 = '<font color=red>(.*?)</font>'
 
-def loadconf():
-    try:
-        f = open('conf.txt')
-        userid, passwd = re.split('\s+', f.readline().strip(), maxsplit=1)
-#        print((userid,passwd))
+def readconf():
+    if os.path.exists(CONF):
+        f = open(CONF)
+        userpass = f.readline().strip()
+        userpass = string.split(userpass, maxsplit=1)
         f.close()
-    except:
+        # print(userpass)
+        if isinstance(userpass, list) and len(userpass) > 1:
+            return userpass
+    else:
         return 8
-    return userid, passwd
+
+def loadconf(getuserpass):
+    try:
+        userpass = readconf()
+        if userpass is 8 or userpass[0] == 'test@lzu.cn':
+            userpass = getuserpass(None)
+            # print(userpass,'l')
+        return userpass
+    except Exception as e:
+        print(e)
+        return 8
 
 #Get the IP address of local machine
 #code from:
