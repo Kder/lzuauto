@@ -9,31 +9,35 @@
     
 使用方法
     
-    解压后，第一次运行 lzuauto.exe（或lzuauto.pyw），会弹出对话框，
-    把自己的账号密码填入，确定，然后点击“登录外网”即可。
+    解压后，第一次运行 lzuauto.exe或lzuauto.pyw ，会弹出对话框，把自己的账号密码填入，
+    确定，然后点击“登录外网”即可。
     
 运行源码版的系统要求
     
-    Linux下面需要的依赖：
+    Linux下需要的依赖：
     
-        python(py2.6以上)
+        Python2.6-Python3
         tcl和tk
         tesseract(ocr工具，主页 http://code.google.com/p/tesseract-ocr/ ）
         各大发行版的源中应该都有上面的包，在Arch Linux和Gentoo Linux下测试通过。
         
     Windows下需要的依赖：
     
-        Python2.6以上，下载地址：http://www.python.org
+        Python2.6-Python3，下载地址：http://www.python.org
 
 '''
 
 
 import sys
 import os
-import Tkinter
-import tkFont
-import tkMessageBox 
-
+try:
+    import tkinter as tk
+    import tkinter.messagebox as tkmsg
+    import tkinter.font as tkfont
+except:
+    import Tkinter as tk
+    import tkFont as tkfont
+    import tkMessageBox  as tkmsg
 if os.name == 'posix':
     import py_compile
     py_compile.compile('main.pyw','main.pyc')
@@ -43,61 +47,59 @@ import main
 
 __version__ = main.__version__
 __revision__ = main.__revision__
-__date__ = '$Date$'
-__author__= '$Author$'
+__date__ = '$Date: 2011-01-09 15:50:28 +0800 (星期日, 2011-01-09) $'
+__author__= '$Author: kderlin $'
 
 
-class Application(Tkinter.Frame):
+class Application(tk.Frame):
 
-    def login(self, event=None):
-        # if main.loadconf() is 8:
-            # self.Dialog(main.TITLE_ERR, main.ERR_CONF, 'error')
+    def login(self, evt=None):
         userpass = main.loadconf(getUserpass)
         # print(type(userpass))
         result = main.login(userpass)
         if result is 1 or 'M)' in result:
-            self.Dialog(main.TITLE_LOGIN, main.MSG_LOGIN.decode('utf-8')
-             % result)
+#            print(type(main.lzuauto_text['MSG_LOGIN']),type(result))
+            self.Dialog(main.lzuauto_text['TITLE_LOGIN'], main.lzuauto_text['MSG_LOGIN'] % result)
         else:
-            self.Dialog(main.TITLE_ERR, result, 'error')
+            self.Dialog(main.lzuauto_text['TITLE_ERR'], result, 'error')
  
-    def logout(self):
+    def logout(self, evt=None):
         if main.logout():
-            self.Dialog(main.TITLE_LOGOUT, main.MSG_LOGOUT)
+            self.Dialog(main.lzuauto_text['TITLE_LOGOUT'], main.lzuauto_text['MSG_LOGOUT'])
         else :
             self.logout
 
-    def checkflow(self):
-        # if main.loadconf() is 8:
-            # self.Dialog(main.TITLE_ERR, main.ERR_CONF, 'error')
+    def checkflow(self, evt=None):
         userpass = main.loadconf(getUserpass)
         flow = main.checkflow(userpass)
         if type(flow) is type(tuple()):
-            self.Dialog(main.TITLE_FLOW, main.MSG_FLOW % flow)
-        elif type(flow) is type(unicode()):
-            self.Dialog(main.TITLE_ERR, flow, 'error')
+            self.Dialog(main.lzuauto_text['TITLE_FLOW'], main.lzuauto_text['MSG_FLOW'] % flow)
         elif flow is 1:
-            self.Dialog(main.TITLE_ERR, main.ERR_OCR, 'error')
+            self.Dialog(main.lzuauto_text['TITLE_ERR'], main.lzuauto_text['ERR_OCR'], 'error')
             sys.exit(4)
         elif flow is 5:
-            self.Dialog(main.TITLE_ERR, main.ERROR_IO, 'error')
+            self.Dialog(main.lzuauto_text['TITLE_ERR'], main.lzuauto_text['ERROR_IO'], 'error')
         elif flow is 6:
-            self.Dialog(main.TITLE_ERR, main.ERR_DJPEG, 'error')
+            self.Dialog(main.lzuauto_text['TITLE_ERR'], main.lzuauto_text['ERR_DJPEG'], 'error')
         elif flow is 7:
-            self.Dialog(main.TITLE_ERR, main.ERR_TESSERACT, 'error')
+            self.Dialog(main.lzuauto_text['TITLE_ERR'], main.lzuauto_text['ERR_TESSERACT'], 'error')
+        else:
+            try:
+                if type(flow) is type(unicode()):
+                    self.Dialog(main.lzuauto_text['TITLE_ERR'], flow, 'error')
+            except:
+                if type(flow) is type(str()):
+                    self.Dialog(main.lzuauto_text['TITLE_ERR'], flow, 'error')
 
     def Dialog(self, title=None, data=None, icon='info'):
-        tkMessageBox.showinfo(title, data, icon=icon)
+        tkmsg.showinfo(title, data, icon=icon)
         
     def About(self, event=None):
-        self.Dialog(main.TITLE_ABOUT, "lzuauto %s.%s\n作者： ysjdxcn & Kder\n\
-项目主页： http://code.google.com/p/lzuauto/ \nLicense : GPLv3" % \
-        (__version__, __revision__.split(':')[1][:-1].strip()))
+        self.Dialog(main.lzuauto_text['TITLE_ABOUT'], "lzuauto %s.%s\n作者： ysjdxcn & Kder\n项目主页： http://code.google.com/p/lzuauto/ \nLicense : GPLv3" % (main.__version__, main.__revision__.split(':')[1][:-1].strip()))
         
     def Usage(self, event=None):
-        '''display a usage dialog'''
         #a class from idlelib
-        class TextViewer(Tkinter.Toplevel):
+        class TextViewer(tk.Toplevel):
             """A simple text viewer dialog for IDLE
 
             """
@@ -105,7 +107,7 @@ class Application(Tkinter.Frame):
                 """Show the given text in a scrollable window with a 'close' button
 
                 """
-                Tkinter.Toplevel.__init__(self, parent)
+                tk.Toplevel.__init__(self, parent)
                 self.configure(borderwidth=5)
                 #elguavas - config placeholders til config stuff completed
                 self.bg = '#ffffff'
@@ -119,15 +121,14 @@ class Application(Tkinter.Frame):
                 self.parent = parent
                 self.textView.focus_set()
                 #key bindings for this dialog
-#                self.bind('<Return>',self.Ok) #dismiss dialog
+                self.bind('<Return>',self.Ok) #dismiss dialog
                 self.bind('<Escape>',self.Ok) #dismiss dialog
                 self.textView.insert(0.0, text)
-#                self.textView.config(state=Tkinter.DISABLED)
+#                self.textView.config(state=tk.DISABLED)
                 self.withdraw()
                 self.update()
 #                x, y = (self.winfo_screenwidth() - self.winfo_reqwidth()) / 2, (self.winfo_screenheight() - self.winfo_reqheight()) / 2
-                x, y = (self.winfo_screenwidth() - self.winfo_width()) / 2, \
-                (self.winfo_screenheight() - self.winfo_height()) / 2
+                x, y = (self.winfo_screenwidth() - self.winfo_width()) / 2, (self.winfo_screenheight() - self.winfo_height()) / 2
 #                sys.stdout.write(str([self.winfo_width(),self.winfo_height()]))
                 self.geometry('+%d+%d' % (x, y))
                 self.deiconify()
@@ -136,37 +137,37 @@ class Application(Tkinter.Frame):
 
             def Ok(self, event=None):
                 self.destroy()
-
+                
             def CreateWidgets(self):
-                frameText = Tkinter.Frame(self, relief=Tkinter.SUNKEN, height=700)
-                frameButtons = Tkinter.Frame(self)
-                self.buttonOk = Tkinter.Button(frameButtons, text='OK',
-                                       command=self.Ok, takefocus=Tkinter.FALSE)
-#                self.scrollbarView = Tkinter.Scrollbar(frameText, orient=Tkinter.VERTICAL,
-#                                               takefocus=Tkinter.FALSE, highlightthickness=0)
-                self.textView = Tkinter.Text(frameText, wrap=Tkinter.WORD, highlightthickness=0,
+                frameText = tk.Frame(self, relief=tk.SUNKEN, height=700)
+                frameButtons = tk.Frame(self)
+                self.buttonOk = tk.Button(frameButtons, text='OK',
+                                       command=self.Ok, takefocus=tk.FALSE)
+#                self.scrollbarView = tk.Scrollbar(frameText, orient=tk.VERTICAL,
+#                                               takefocus=tk.FALSE, highlightthickness=0)
+                self.textView = tk.Text(frameText, wrap=tk.WORD, highlightthickness=0,
                                      fg=self.fg, bg=self.bg)
 #                self.scrollbarView.config(command=self.textView.yview)
 #                self.textView.config(yscrollcommand=self.scrollbarView.set)
                 self.buttonOk.pack()
-#                self.scrollbarView.pack(side=Tkinter.RIGHT,fill=Tkinter.Y)
-                self.textView.pack(side=Tkinter.LEFT,expand=Tkinter.TRUE,fill=Tkinter.BOTH)
-                frameButtons.pack(side=Tkinter.BOTTOM,fill=Tkinter.X)
-                frameText.pack(side=Tkinter.TOP,expand=Tkinter.TRUE,fill=Tkinter.BOTH)
-
-        tv = TextViewer(self, main.TITLE_USAGE, __doc__)
+#                self.scrollbarView.pack(side=tk.RIGHT,fill=tk.Y)
+                self.textView.pack(side=tk.LEFT,expand=tk.TRUE,fill=tk.BOTH)
+                frameButtons.pack(side=tk.BOTTOM,fill=tk.X)
+                frameText.pack(side=tk.TOP,expand=tk.TRUE,fill=tk.BOTH)
+     
+        tv = TextViewer(self, main.lzuauto_text['TITLE_USAGE'], __doc__)
 
     def createWidgets(self):
+        ft = tkfont.Font(family = '宋体',size = 9,weight = tkfont.NORMAL)
 
         # top = self.winfo_toplevel()
-        # self.menuBar = Tkinter.Menu(top)
+        # self.menuBar = tk.Menu(top)
         # top["menu"] = self.menuBar
-        ft = tkFont.Font(family = '宋体',size = 9,weight = tkFont.NORMAL)
-        self.menuBar = Tkinter.Menu(self)
+        self.menuBar = tk.Menu(self)
         self.master["menu"] = self.menuBar
-        self.subMenu1 = Tkinter.Menu(self.menuBar, tearoff=0, font=ft)
-        self.subMenu2 = Tkinter.Menu(self.menuBar, tearoff=0, font=ft)
-        self.subMenu3 = Tkinter.Menu(self.menuBar, tearoff=0, font=ft)
+        self.subMenu1 = tk.Menu(self.menuBar, tearoff=0, font=ft)
+        self.subMenu2 = tk.Menu(self.menuBar, tearoff=0, font=ft)
+        self.subMenu3 = tk.Menu(self.menuBar, tearoff=0, font=ft)
         self.menuBar.add_cascade(label="文件(F)", menu=self.subMenu1, underline =3)
         self.subMenu1.add_command(label="退出(X)", command=self.quit, accelerator='Ctrl+Q', underline =3)
         self.menuBar.add_cascade(label="设置(S)", menu=self.subMenu2, underline =3)
@@ -180,39 +181,34 @@ class Application(Tkinter.Frame):
         actions = [self.login, self.checkflow, self.logout, self.Quit]
         idx = 0
         for bdw in range(2):
-            setattr(self, 'of%d' % bdw, Tkinter.Frame(self, borderwidth=0))
-            Tkinter.Label(getattr(self, 'of%d' % bdw), text=None).pack(side=Tkinter.LEFT)
+            setattr(self, 'of%d' % bdw, tk.Frame(self, borderwidth=0))
+            tk.Label(getattr(self, 'of%d' % bdw), text=None).pack(side=tk.LEFT)
             for i in range(2):
-                buttons.append(Tkinter.Button(getattr(self, 'of%d' % bdw),
-                 text=button_label[idx], width=10, command=actions[idx], font=ft))
-                buttons[idx].pack(side=Tkinter.LEFT, padx=7, pady=7)
+                buttons.append(tk.Button(getattr(self, 'of%d' % bdw), 
+                    text=button_label[idx], width=10, command=actions[idx], font=ft))
+                buttons[idx].pack(side=tk.LEFT, padx=7, pady=7)
                 idx += 1
             getattr(self, 'of%d' % bdw).pack()
         buttons[0].focus_set()
         for i in range(4):
             buttons[i].bind('<Key-Return>',actions[i])
-        # buttons[0].bind('<Enter>',actions[0])
 
     def Quit(self, event=None):
         self.destroy()
-        # root.destroy()
-        self.master.destroy()
+        root.destroy()
         sys.exit()
         
     def __init__(self, master):
-        Tkinter.Frame.__init__(self, master)
-        global userpass
-
+        tk.Frame.__init__(self, master)
         self.pack()
         self.createWidgets()
-        self.master.title('兰大上网认证登录工具')
+        self.master.title('兰大上网认证系统自动登录工具')
 #        self.master.withdraw()
 #        self.master.Popup()
         self.master.withdraw()
         self.master.update()
 #        self.master.overrideredirect(1)
-        self.x, self.y = (self.master.winfo_screenwidth() - self.master.winfo_width()) / 2, \
-        (self.master.winfo_screenheight() - self.master.winfo_height()) / 2
+        self.x, self.y = (self.master.winfo_screenwidth() - self.master.winfo_width()) / 2, (self.master.winfo_screenheight() - self.master.winfo_height()) / 2
 #        sys.stdout.write(str((x, y)))
         self.master.geometry('+%d+%d' % (self.x, self.y))
         self.master.deiconify()
@@ -226,25 +222,25 @@ class Application(Tkinter.Frame):
         # self.protocol("WM_DELETE_WINDOW", self.Ok)
         # self.wait_window()
 
-class MyDialog(Tkinter.Frame):
+class MyDialog(tk.Frame):
     def __init__(self, master=None):
         global userpass
-        Tkinter.Frame.__init__(self, master)
-        self.v1 = Tkinter.StringVar()
-        self.v2 = Tkinter.StringVar()
-        l1=Tkinter.Label(self,text="账号:")
+        tk.Frame.__init__(self, master)
+        self.v1 = tk.StringVar()
+        self.v2 = tk.StringVar()
+        l1=tk.Label(self,text="账号:")
         l1.grid(row=0,column=0)
-        self.e1=Tkinter.Entry(self, textvariable=self.v1)
+        self.e1=tk.Entry(self, textvariable=self.v1)
         self.e1.grid(row=0,column=1)
-        l2=Tkinter.Label(self,text="密码:")
+        l2=tk.Label(self,text="密码:")
         l2.grid(row=1,column=0)
-        self.e2=Tkinter.Entry(self,show="*", textvariable=self.v2)
+        self.e2=tk.Entry(self,show="*", textvariable=self.v2)
         self.e2.grid(row=1,column=1)
         self.e2.bind('<Key-Return>', self.Ok)
         self.e1.focus_set()
-        b1=Tkinter.Button(self,text='确定', command=self.Ok)
+        b1=tk.Button(self,text='确定', command=self.Ok)
         b1.grid(row=2,column=0)
-        b2=Tkinter.Button(self,text='取消', command=self.Cancel)
+        b2=tk.Button(self,text='取消', command=self.Cancel)
         b2.grid(row=2,column=1)
         
         self.userpass = main.readconf()
@@ -252,7 +248,7 @@ class MyDialog(Tkinter.Frame):
             # self.v1.set(self.userpass[0])
             # self.v2.set(self.userpass[1])
             self.e1.insert(0,self.userpass[0])
-            self.e1.select_range(0,Tkinter.END)
+            self.e1.select_range(0,tk.END)
             self.e2.insert(0,self.userpass[1])
         userpass = self.userpass
 
@@ -286,7 +282,7 @@ class MyDialog(Tkinter.Frame):
         
 def getUserpass(evt=None):
     global userpass
-    root2=Tkinter.Tk()
+    root2=tk.Tk()
     myapp = MyDialog(root2)
     myapp.master.title("请输入账号密码：")
     # myapp.master.maxsize(1000, 400)
@@ -294,16 +290,12 @@ def getUserpass(evt=None):
     # print(userpass,'g')
     return userpass
         
+        
 if __name__ == "__main__":
-    root = Tkinter.Tk()
+    root = tk.Tk()
     app = Application(master=root)
-    # if main.loadconf() is 8:
-        # app.Dialog(main.TITLE_ERR, main.ERR_CONF, 'error')
-        # sys.exit(3)
     userpass = main.loadconf(getUserpass)
     app.mainloop()
-    
     # root.destroy()
 
-#$Id$
 #vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4

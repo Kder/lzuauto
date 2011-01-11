@@ -12,7 +12,7 @@ if len(sys.argv) == 1:
     sys.argv.append('py2exe')
 
 main_exe = {"script": "main.pyw",
-#"icon_resources": [(0,'bialix.ico')],
+"icon_resources": [(0,'lzuauto.ico')],
 "name": "lzuauto",
 "version": '%s.%s' % (main.__version__, main.__revision__.split(':')[1][:-1].strip()),
 "description": u"兰大上网认证系统客户端",
