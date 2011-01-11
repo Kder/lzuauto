@@ -37,6 +37,7 @@ options_main = {'py2exe': {'bundle_files': 3,
             #'ascii' : True,
             #'dll_excludes' : ['msvcr71.dll'],
             'dist_dir':'lzuauto-gtk',
+#            'dist_dir':'lzuauto-gtk1',
             }
 }
 
@@ -48,6 +49,7 @@ options_lzuauto = {'py2exe': {'bundle_files': 3,
             'inspect', 'pickle','unicodedata', 'gtk', 'pygtk', 'gobject', 'pygobject',
             'glib', 'atk','dsextras','cairo','gio','pango','pangocairo'],
             'dist_dir':'lzuauto-tk',
+#            'dist_dir':'lzuauto-tk1',
             }
 }
 
@@ -55,12 +57,12 @@ setup(name = 'lzuauto-tk',
       windows=[lzuauto_exe],
       options = options_lzuauto,
 )
-
 setup(name = 'lzuauto-gtk',
       windows=[main_exe],
       zipfile = None,
       options = options_main,
 )
+#sys.exit()
 
 base_files = [
 'conf.txt',
@@ -73,8 +75,7 @@ base_files = [
 src_files = base_files + [
 'main.pyw',
 'lzuauto.pyw',
-'setup.py',
-#'pack.py',
+#'setup.py',
 ]
 src_args = ' '.join(src_files)
 
