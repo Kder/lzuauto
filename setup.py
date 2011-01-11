@@ -83,10 +83,12 @@ try:
     for i in base_files:
         for j in ['lzuauto-gtk', 'lzuauto-tk']:
             if os.path.isdir(i):
-                if not os.path.isdir(j+os.sep+i):
-                    shutil.copytree(i,j+os.sep+i)
+                if not os.path.isdir(j + os.sep + i):
+                    shutil.copytree(i, j + os.sep + i)
             else:
-                shutil.copy(i,j)
+                shutil.copy(i, j)
+    if not os.path.isdir('lzuauto-gtk' + os.sep + 'etc'):
+        shutil.copytree('etc', 'lzuauto-gtk' + os.sep + 'etc')
     os.system('upx lzuauto-gtk/*.pyd lzuauto-gtk/*.exe lzuauto-gtk/*.dll')
     os.system('upx lzuauto-tk/*.pyd lzuauto-tk/*.exe lzuauto-tk/*.dll')
 
