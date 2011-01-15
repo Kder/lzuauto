@@ -192,6 +192,7 @@ class Application(tk.Frame):
                 idx += 1
             getattr(self, 'of%d' % bdw).pack()
         buttons[0].focus_set()
+        buttons[1].config(state=tk.DISABLED)
         for i in range(4):
             buttons[i].bind('<Key-Return>',actions[i])
 

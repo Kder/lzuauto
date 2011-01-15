@@ -537,6 +537,8 @@ if __name__ == "__main__":
             result = login(userpass)
             if result is 1 or 'M)' in result:
                 self.Dialog(lzuauto_text['TITLE_LOGIN'], lzuauto_text['MSG_LOGIN'] % result)
+            elif TFMMSG['find1'] in result:
+                self.Dialog(lzuauto_text['TITLE_LOGIN'], TFMMSG[15] + result)
             else:
                 self.Dialog(lzuauto_text['TITLE_ERR'], result, icon = gtk.MESSAGE_ERROR)
         
@@ -663,7 +665,7 @@ if __name__ == "__main__":
                 button[i].connect("clicked", actions[i], button_label[i])
                 image[i].set_from_stock(stocks[i], gtk.ICON_SIZE_BUTTON)
                 button[i].set_image(image[i])
-
+            button[2].set_sensitive(False)
     #        main_vbox.pack_start(button1, True, True, 0)
     #        main_vbox.pack_start(button2, True, True, 3)
     #        main_vbox.pack_start(button3, True, True, 0)
