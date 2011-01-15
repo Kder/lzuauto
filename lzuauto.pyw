@@ -61,12 +61,13 @@ class Application(tk.Frame):
 #            print(type(main.lzuauto_text['MSG_LOGIN']),type(result))
             self.Dialog(main.lzuauto_text['TITLE_LOGIN'], main.lzuauto_text['MSG_LOGIN'] % result)
         else:
-            self.Dialog(main.lzuauto_text['TITLE_ERR'], result, 'error')
+            self.Dialog(main.lzuauto_text['TITLE_LOGIN'], result)
+            # self.Dialog(main.lzuauto_text['TITLE_ERR'], result, 'error')
  
     def logout(self, evt=None):
         if main.logout():
             self.Dialog(main.lzuauto_text['TITLE_LOGOUT'], main.lzuauto_text['MSG_LOGOUT'])
-        else :
+        else:
             self.logout
 
     def checkflow(self, evt=None):

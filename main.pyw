@@ -66,22 +66,24 @@ import random
 CHK_COUNT = 0
 
 lzuauto_text = {
-'ERR_CONF' : '无法打开配置文件conf.txt或者文件格式错误，请确认文件存在，且格式为 邮箱 密码',
-'ERR_AUTH' : '请检查conf.txt中的邮箱和密码是否正确(格式为"邮箱 密码"，不含引号)',
-'ERR_OCR' : '请检查conf.txt中的邮箱和密码是否正确；如果设置正确，请稍候再试一次',
-'ERR_TESSERACT' : 'tesseract错误，请确认tesseract是否正确安装',
-'ERR_DJPEG' : 'djpeg错误，请确认libjpeg是否正确安装且djpeg命令可用',
-'ERR_IO' : '文件写入错误，请确认程序所在目录有读写权限',
-'ERR_CODECHECK' : '验证码错误，请重新提交。',
-'MSG_FLOW' : '您本月已经使用的流量为 %s MB\n您本月已经上网 %s 小时',
-'MSG_LOGIN' : "登录成功^_^ %s",
-'MSG_LOGOUT' : '您已经成功退出:-)\n',
-'TITLE_LOGIN' : '登录成功',
-'TITLE_LOGOUT' : "退出外网",
-'TITLE_ABOUT' : '关于',
-'TITLE_USAGE' : '用法',
-'TITLE_ERR' : '错误',
-'TITLE_FLOW' : '流量查询',
+'ERR_CONF': '无法打开配置文件conf.txt或者文件格式错误，请确认文件存在，且格式为 邮箱 密码',
+'ERR_AUTH': '请检查conf.txt中的邮箱和密码是否正确(格式为"邮箱 密码"，不含引号)',
+'ERR_OCR': '请检查conf.txt中的邮箱和密码是否正确；如果设置正确，请稍候再试一次',
+'ERR_TESSERACT': 'tesseract错误，请确认tesseract是否正确安装',
+'ERR_DJPEG': 'djpeg错误，请确认libjpeg是否正确安装且djpeg命令可用',
+'ERR_IO': '文件写入错误，请确认程序所在目录有读写权限',
+'ERR_CODECHECK': '验证码错误，请重新提交。',
+'MSG_FLOW': '您本月已经使用的流量为 %s MB\n您本月已经上网 %s 小时',
+'DRCOM_MSG_TIME': '本帐号已使用时间: %d天 %d小时 %d分钟\n',
+'DRCOM_MSG_FLOW':  '本帐号已使用流量: %dT %dG %.3fM Bytes\n',
+'MSG_LOGIN': "登录成功^_^ %s",
+'MSG_LOGOUT': '您已经成功退出:-)\n',
+'TITLE_LOGIN': '登录成功',
+'TITLE_LOGOUT': "退出外网",
+'TITLE_ABOUT': '关于',
+'TITLE_USAGE': '用法',
+'TITLE_ERR': '错误',
+'TITLE_FLOW': '流量查询',
 }
 option = "alert\((.*?)\);"
 # option = "'\(.*?\)'"
@@ -231,55 +233,104 @@ def get_http_res(host, path, params=None, headers=None):
     data = response.read().decode('gb2312')
     conn.close()
     return data
+
+
+def process_ret(ret):
+    msg = re.findall("Msg=([\d.]+);", ret)
+    msga = re.findall("msga='(.*)'", ret)
+    if msg != [] and msga != []:
+        if DispTFM(msg[0], msga[0]) != 0:
+            return -1
+    flow = re.findall("flow='([\d.]+)\s*'", ret)
+    time = re.findall("time='([\d.]+)\s*'", ret)
+    if flow != [] and time != []:
+        time = int(time[0])  # unit is minute
+        flow = int(flow[0])  # unit is kbyte
+#        flow0=flow % 1024; flow1=flow - flow0; flow0 = flow0 * 1000;
+#        flow0 = flow0 - flow0 % 1024
+#        flow0 = (flow % 1024) * 1000 - ((flow % 1024) * 1000) % 1024
+#        flow_kb = flow - flow % 1024
+#        flow0mb = flow % 1024 / 1024.0
+        days = time / 60 / 24
+        hours = time / 60 % 24
+        minutes = time % 60
+        flow_tb = flow / 1073741824
+        flow_gb = flow % 1073741824 / 1048576
+        flow_mb = flow / 1024 % 1024 + flow % 1024 / 1024.0
+        time_flow = lzuauto_text['DRCOM_MSG_TIME'] % (days, hours, minutes) + \
+        lzuauto_text['DRCOM_MSG_FLOW'] % (flow_tb, flow_gb, flow_mb)
+        return time_flow
+    else:
+        return ret
+    
     
 def login(userpass):
-    (userid, passwd) = userpass
-    params = urlparse.urlencode({'wlanuserip':ip,'wlanacname':'BAS_138',
-    'auth_type':'PAP','wlanacIp':'202.201.1.138','userid':userid,'passwd':passwd,
-    'chal_id':'','chal_vector':'','seq_id':'','req_id':''})
+    params = urlparse.urlencode({'DDDDD': userpass[0],
+            'upass': userpass[1],
+            '0MKKey': '登录 Login',
+            'v6ip': ''})
     headers = {"Content-type": "application/x-www-form-urlencoded", 
-    "Accept": "text/plain"}
-    data = get_http_res("202.201.1.140", "/portalAuthAction.do", params, headers)
-    #print data
-    result = re.findall(option, data)
-    if len(result)>0:
-        if result[0] == 'temp':
-            # print(result)
-            result = re.findall("var temp=('.+?')", data)
-            usertime = re.findall('''"usertime" value='(\d+)''', data)[0]
-            # print(usertime)
-            try:
-                with open('lzuauto.ini','w') as f:
-                    f.write(usertime)
-            except:
-                pass
-        return result[0].strip("'")#.split('\'')[1]
-    else:
-        return 1
+        "Accept": "text/plain",
+        'Referer': 'http://10.10.0.202/'
+        }
+    get_http_res('10.10.0.202', '/', params, headers)
+    data = get_http_res('10.10.0.202', '/', headers=headers)
+    return process_ret(data)
+
 
 def logout():
-    usertime = None
-    try:
-        with open(CONF2,'r') as f:
-            usertime = f.readline().strip()
-    except:
-        pass
-    # x <- (0,180) y <- (0,50)
-    x = random.randrange(0,180)
-    y = random.randrange(0,50)
-    params = urlparse.urlencode({'wlanuserip':ip,'wlanacname':'BAS_138','wlanacIp':'202.201.1.138',
-    'portalUrl':'','usertime':usertime or '3146400','imageField.x':x,'imageField.y':y})
-    # print(params)
     headers = {"Content-type": "application/x-www-form-urlencoded", 
-    "Accept": "text/plain"}
-    conn = http.HTTPConnection("202.201.1.140")
-    conn.request("POST", "/portalDisconnAction.do", params, headers)
-    response = conn.getresponse()
-    conn.close()
-    if response.status == 200:
-        return 1
-    else :
-        return 0
+        "Accept": "text/plain",
+        'Referer': 'http://10.10.0.202:9002/0'
+        }
+    data = get_http_res('10.10.0.202', '/F.htm', headers=headers)
+    return 1
+
+
+# def login(userpass):
+    # (userid, passwd) = userpass
+    # params = urlparse.urlencode({'wlanuserip':ip,'wlanacname':'BAS_138',
+    # 'auth_type':'PAP','wlanacIp':'202.201.1.138','userid':userid,'passwd':passwd,
+    # 'chal_id':'','chal_vector':'','seq_id':'','req_id':''})
+    # headers = {"Content-type": "application/x-www-form-urlencoded", 
+    # "Accept": "text/plain"}
+    # data = get_http_res("202.201.1.140", "/portalAuthAction.do", params, headers)
+    # result = re.findall(option, data)
+    # if len(result)>0:
+        # if result[0] == 'temp':
+            # result = re.findall("var temp=('.+?')", data)
+            # usertime = re.findall('''"usertime" value='(\d+)''', data)[0]
+            # try:
+                # with open('lzuauto.ini','w') as f:
+                    # f.write(usertime)
+            # except:
+                # pass
+        # return result[0].strip("'")  # .split('\'')[1]
+    # else:
+        # return 1
+
+# def logout():
+    # usertime = None
+    # try:
+        # with open(CONF2,'r') as f:
+            # usertime = f.readline().strip()
+    # except:
+        # pass
+    ## x <- (0,180) y <- (0,50)
+    # x = random.randrange(0,180)
+    # y = random.randrange(0,50)
+    # params = urlparse.urlencode({'wlanuserip':ip,'wlanacname':'BAS_138','wlanacIp':'202.201.1.138',
+    # 'portalUrl':'','usertime':usertime or '3146400','imageField.x':x,'imageField.y':y})
+    # headers = {"Content-type": "application/x-www-form-urlencoded", 
+    # "Accept": "text/plain"}
+    # conn = http.HTTPConnection("202.201.1.140")
+    # conn.request("POST", "/portalDisconnAction.do", params, headers)
+    # response = conn.getresponse()
+    # conn.close()
+    # if response.status == 200:
+        # return 1
+    # else:
+        # return 0
 
 def ocr(data):
     '''input: jpeg image string stream
@@ -450,7 +501,7 @@ if __name__ == "__main__":
             #print 'logout'
             if logout():
                 self.Dialog(lzuauto_text['TITLE_LOGOUT'], lzuauto_text['MSG_LOGOUT'])
-            else :
+            else:
                 self.logout
 
         def checkflow(self, widget, data=None):

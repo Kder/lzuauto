@@ -1,1 +1,1 @@
-test@lzu.cn testpasswd
+test test
