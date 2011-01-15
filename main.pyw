@@ -627,6 +627,7 @@ if __name__ == "__main__":
             buffer = gtk.TextBuffer()
             buffer.set_text(data)
             textview = gtk.TextView(buffer)
+            textview.set_pixels_below_lines(8)
             textview.set_editable(False)
             dialog.vbox.pack_start(textview)
     #        textview.modify_font(pango.FontDescription("sans 10"))
