@@ -92,9 +92,9 @@ try:
     os.system('upx lzuauto-gtk/*.pyd lzuauto-gtk/*.exe lzuauto-gtk/*.dll')
     os.system('upx lzuauto-tk/*.pyd lzuauto-tk/*.exe lzuauto-tk/*.dll')
 
-    os.system('7z a -t7z -xr!*.svn* lzuauto-%s-src.7z %s' % \
+    os.system('7z a -xr!*.svn* lzuauto-%s-src.zip %s' % \
                 (main.__version__, src_args))
-    os.system('7z a -t7z -xr!*.svn* lzuauto-%s-win-gtk.7z lzuauto-gtk' % main.__version__)
+    os.system('7z a -xr!*.svn* lzuauto-%s-win-gtk.zip lzuauto-gtk' % main.__version__)
 except Exception,e:
     sys.stderr.write(str(e))
     sys.stderr.write('Error.')
@@ -129,5 +129,5 @@ tk_files = [
 
 tk_args = ' '.join(tk_files)
 
-os.system(r'7z a -t7z -xr!*.svn* lzuauto-%s-win-tk.7z %s' % \
+os.system(r'7z a -xr!*.svn* lzuauto-%s-win-tk.zip %s' % \
             (lzuauto.__version__, tk_args))
