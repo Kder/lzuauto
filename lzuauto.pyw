@@ -47,8 +47,8 @@ import main
 
 __version__ = main.__version__
 __revision__ = main.__revision__
-__date__ = '$Date: 2011-01-09 15:50:28 +0800 (星期日, 2011-01-09) $'
-__author__ = '$Author: kderlin $'
+__date__ = '$Date$'
+__author__ = '$Author$'
 
 LATXT = main.lzuauto_text
 
@@ -99,7 +99,7 @@ class Application(tk.Frame):
         tkmsg.showinfo(title, data, icon=icon)
 
     def About(self, event=None):
-        self.Dialog(LATXT['TITLE_ABOUT'], "lzuauto %s.%s\n作者： ysjdxcn & Kder\
+        self.Dialog(LATXT['TITLE_ABOUT'], "lzuauto %s.%s\n作者： ysjdxcn & Kder\n\
 项目主页： http://code.google.com/p/lzuauto/ \nLicense : GPLv3" %
         (main.__version__, main.__revision__.split(':')[1][:-1].strip()))
 
