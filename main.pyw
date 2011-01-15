@@ -3,41 +3,41 @@
 
 '''
 lzuauto - 兰大上网认证系统自动登录工具。
-    
+
 主要功能
-    
+
     一键登录/退出、流量查询（支持验证码识别）
-    
+
 使用方法
-    
+
     解压后，第一次运行 main.exe（或main.pyw），会弹出对话框，把自己的账号密码填入，
     确定，然后点击“登录外网”即可。
-    
+
 运行源码版的系统要求
-    
+
     Linux下需要的依赖：
-    
+
         python(py2.6以上,支持python3)
         pygtk或者Tcl/tk
         tesseract(ocr工具，主页 http://code.google.com/p/tesseract-ocr/ )
         各大发行版的源中应该都有上面的包，在Arch Linux和Gentoo Linux下测试通过。
-        
+
     Windows下需要的依赖：
-        python2.6/2.7，或Python3（仅支持tk界面） http://www.python.org 
-        
-        以下4个仅GTK界面需要 
-            pycairo http://ftp.gnome.org/pub/GNOME/binaries/win32/pygtk/ 
-            pygobject http://ftp.gnome.org/pub/GNOME/binaries/win32/pycairo/ 
-            pygtk http://ftp.gnome.org/pub/GNOME/binaries/win32/pygobject/ 
+        python2.6/2.7，或Python3（仅支持tk界面） http://www.python.org
+
+        以下4个仅GTK界面需要
+            pycairo http://ftp.gnome.org/pub/GNOME/binaries/win32/pygtk/
+            pygobject http://ftp.gnome.org/pub/GNOME/binaries/win32/pycairo/
+            pygtk http://ftp.gnome.org/pub/GNOME/binaries/win32/pygobject/
             GTK+(All-in-one bundles) http://www.gtk.org/download-windows.html
 
 '''
 
-__author__= ['ysjdxcn','Kder']
+__author__ = ['ysjdxcn', 'Kder']
 __copyright__ = 'Copyright 2010 ysjdxcn & Kder'
-__credits__ = ['ysjdxcn','Kder']
+__credits__ = ['ysjdxcn', 'Kder']
 
-__maintainer__ = ['ysjdxcn','Kder']
+__maintainer__ = ['ysjdxcn', 'Kder']
 __email__ = ['ysjdxcn (#)gmail dot com', 'kderlin (#)gmail dot com']
 __url__ = ['http://ranhouzenyang.com/', 'http://www.kder.info']
 __license__ = 'GNU General Public License v3'
@@ -126,7 +126,7 @@ if sys.version_info.major is 2:
         lzuauto_text[i] = unicode(lzuauto_text[i], 'utf-8')
     for i in TFMMSG:
         TFMMSG[i] = unicode(TFMMSG[i], 'utf-8')
-        
+
 
 def readconf():
     if os.path.exists(CONF):
@@ -140,6 +140,7 @@ def readconf():
     else:
         return 8
 
+
 def loadconf(getuserpass):
     try:
         userpass = readconf()
@@ -147,7 +148,7 @@ def loadconf(getuserpass):
             userpass = getuserpass(None)
             # print(userpass,'l')
         return userpass
-    except: #Exception as e:
+    except:  # Exception as e:
 #        print(e)
         return 8
 
@@ -235,7 +236,6 @@ def getIPAddresses():
                     yield ipAddr
 
 
-
 def get_ip():
     if sys.platform == 'win32':
         return [x for x in getIPAddresses()]
@@ -297,19 +297,19 @@ def process_ret(ret):
         flow_tb = flow / 1073741824
         flow_gb = flow % 1073741824 / 1048576
         flow_mb = flow / 1024 % 1024 + flow % 1024 / 1024.0
-        time_flow = lzuauto_text['DRCOM_MSG_TIME'] % (days, hours, minutes) + \
-        lzuauto_text['DRCOM_MSG_FLOW'] % (flow_tb, flow_gb, flow_mb)
+        time_flow = lzuauto_text['DRCOM_MSG_TIME'] % (days, hours, minutes) \
+         + lzuauto_text['DRCOM_MSG_FLOW'] % (flow_tb, flow_gb, flow_mb)
     else:
         time_flow = ''
     return msg1 + time_flow
-    
-    
+
+
 def login(userpass):
     params = urlparse.urlencode({'DDDDD': userpass[0],
             'upass': userpass[1],
             '0MKKey': '登录 Login',
             'v6ip': ''})
-    headers = {"Content-type": "application/x-www-form-urlencoded", 
+    headers = {"Content-type": "application/x-www-form-urlencoded",
         "Accept": "text/plain",
         'Referer': 'http://10.10.0.202/'
         }
@@ -322,7 +322,7 @@ def login(userpass):
 
 
 def logout():
-    headers = {"Content-type": "application/x-www-form-urlencoded", 
+    headers = {"Content-type": "application/x-www-form-urlencoded",
         "Accept": "text/plain",
         'Referer': 'http://10.10.0.202:9002/0'
         }
@@ -333,11 +333,12 @@ def logout():
 # def login(userpass):
     # (userid, passwd) = userpass
     # params = urlparse.urlencode({'wlanuserip':ip,'wlanacname':'BAS_138',
-    # 'auth_type':'PAP','wlanacIp':'202.201.1.138','userid':userid,'passwd':passwd,
-    # 'chal_id':'','chal_vector':'','seq_id':'','req_id':''})
-    # headers = {"Content-type": "application/x-www-form-urlencoded", 
+    # 'auth_type':'PAP','wlanacIp':'202.201.1.138','userid':userid,
+#    'passwd':passwd,'chal_id':'','chal_vector':'','seq_id':'','req_id':''})
+    # headers = {"Content-type": "application/x-www-form-urlencoded",
     # "Accept": "text/plain"}
-    # data = get_http_res("202.201.1.140", "/portalAuthAction.do", params, headers)
+    # data = get_http_res("202.201.1.140", "/portalAuthAction.do",
+#    params, headers)
     # result = re.findall(option, data)
     # if len(result)>0:
         # if result[0] == 'temp':
@@ -362,9 +363,10 @@ def logout():
     ## x <- (0,180) y <- (0,50)
     # x = random.randrange(0,180)
     # y = random.randrange(0,50)
-    # params = urlparse.urlencode({'wlanuserip':ip,'wlanacname':'BAS_138','wlanacIp':'202.201.1.138',
-    # 'portalUrl':'','usertime':usertime or '3146400','imageField.x':x,'imageField.y':y})
-    # headers = {"Content-type": "application/x-www-form-urlencoded", 
+    # params = urlparse.urlencode({'wlanuserip':ip,'wlanacname':'BAS_138',
+#   'wlanacIp':'202.201.1.138','portalUrl':'','usertime':usertime or '3146400',
+    # 'imageField.x':x,'imageField.y':y})
+    # headers = {"Content-type": "application/x-www-form-urlencoded",
     # "Accept": "text/plain"}
     # conn = http.HTTPConnection("202.201.1.140")
     # conn.request("POST", "/portalDisconnAction.do", params, headers)
@@ -413,13 +415,14 @@ def ocr(data):
         except:
             return 6
     os.environ['TESSDATA_PREFIX'] = PROGRAM_PATH + os.sep
-    args = [PROGRAM_PATH + os.sep + 'tesseract', img_name, 'ocr', 'nobatch', 'digits']
+    args = [PROGRAM_PATH + os.sep + 'tesseract', img_name,
+            'ocr', 'nobatch', 'digits']
     #~ print os.getcwd(),args
     proc = subprocess.Popen(args, shell=True)
     retcode = proc.wait()
-    if retcode!=0:
+    if retcode != 0:
         return 7
-    f = open('ocr.txt','r')
+    f = open('ocr.txt', 'r')
     s = f.read().strip()
     f.close()
 #    sys.exit(-1)
@@ -428,40 +431,44 @@ def ocr(data):
         os.remove('ocr.txt')
     except:
         pass
-    
+
     return s
-    
+
 
 def verify(userpass, headers):
     (userid, passwd) = userpass
-    data = get_http_res('a.lzu.edu.cn', '/servlet/AuthenCodeImage', headers = headers)
+    data = get_http_res('a.lzu.edu.cn', '/servlet/AuthenCodeImage',
+        headers=headers)
     s = ocr(data)
     if type(s) is not type(str()):
         return s
-    params = urlparse.urlencode({'user_id':userid,'passwd':passwd,'validateCode':s})
-    data = get_http_res('a.lzu.edu.cn', '/selfLogonAction.do', params, headers)
+    params = urlparse.urlencode({'user_id': userid, 'passwd': passwd,
+                                'validateCode': s})
+    data = get_http_res('a.lzu.edu.cn', '/selfLogonAction.do', params,
+                headers)
     err = re.findall(option3, data)
 #    if 'selfLogon' in response2.getheaders()[3][1]:
 #    print(err)
     return err
 #    sys.exit()
 
+
 def checkflow(userpass):
     (userid, passwd) = userpass
-    headers = {"User-Agetn":"Mozilla/5.0 (X11; U; Linux i686; en-US; \
+    headers = {"User-Agetn": "Mozilla/5.0 (X11; U; Linux i686; en-US; \
 rv:1.9.2.10)Gecko/20101020 Firefox/3.6.11",
     "Content-type": "application/x-www-form-urlencoded",
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,\
 */*;q=0.8",
-    "Keep-Alive":"115",
-    "Connection":"keep-alive"}
+    "Keep-Alive": "115",
+    "Connection": "keep-alive"}
 
     conn = http.HTTPConnection("a.lzu.edu.cn")
-    conn.request('GET', '/', headers = headers)
+    conn.request('GET', '/', headers=headers)
     response = conn.getresponse()
     #print response.getheaders()
     cookie = response.getheader('set-cookie').split()[0]
-    temp = {'Cookie':cookie}
+    temp = {'Cookie': cookie}
     headers.update(temp)
     conn.close()
 
@@ -478,12 +485,13 @@ rv:1.9.2.10)Gecko/20101020 Firefox/3.6.11",
             return res[0] + '\n' + lzuauto_text['ERR_AUTH']
 
     get_http_res("a.lzu.edu.cn", '/selfIndexAction.do', headers=headers)
-    data = get_http_res("a.lzu.edu.cn", '/userQueryAction.do', headers=headers)
+    data = get_http_res("a.lzu.edu.cn", '/userQueryAction.do',
+        headers=headers)
 
-    mb = re.findall(option1,data)
-    hour = re.findall(option2,data)
+    mb = re.findall(option1, data)
+    hour = re.findall(option2, data)
 
-    if len(mb)>0:
+    if len(mb) > 0:
         MB = mb[0].split('&nbsp')[0][1:]
         HOUR = hour[0].split('&nbsp')[0]
 #        print MB,HOUR
@@ -492,6 +500,7 @@ rv:1.9.2.10)Gecko/20101020 Firefox/3.6.11",
 
 def checkstatus():
     pass
+
 
 #######################################################################
 
@@ -511,11 +520,10 @@ if __name__ == "__main__":
         sys.stdout.write('gtk needed')
         sys.exit(2)
 
-
     class Interface:
         '''interface:
         The interface of this.'''
-        
+
         ui = '''<ui>
         <menubar name="MenuBar">
           <menu action="File">
@@ -530,22 +538,26 @@ if __name__ == "__main__":
           </menu>
         </menubar>
         </ui>'''
-        
+
         def login(self, widget, data=None):
             #print 'login'
             userpass = loadconf(getUserpass)
             result = login(userpass)
             if result is 1 or 'M)' in result:
-                self.Dialog(lzuauto_text['TITLE_LOGIN'], lzuauto_text['MSG_LOGIN'] % result)
+                self.Dialog(lzuauto_text['TITLE_LOGIN'],
+                    lzuauto_text['MSG_LOGIN'] % result)
             elif TFMMSG['find1'] in result:
-                self.Dialog(lzuauto_text['TITLE_LOGIN'], TFMMSG[15] + result)
+                self.Dialog(lzuauto_text['TITLE_LOGIN'],
+                    TFMMSG[15] + result)
             else:
-                self.Dialog(lzuauto_text['TITLE_ERR'], result, icon = gtk.MESSAGE_ERROR)
-        
+                self.Dialog(lzuauto_text['TITLE_ERR'], result,
+                    icon=gtk.MESSAGE_ERROR)
+
         def logout(self, widget, data=None):
             #print 'logout'
             if logout():
-                self.Dialog(lzuauto_text['TITLE_LOGOUT'], lzuauto_text['MSG_LOGOUT'])
+                self.Dialog(lzuauto_text['TITLE_LOGOUT'],
+                    lzuauto_text['MSG_LOGOUT'])
             else:
                 self.logout
 
@@ -553,26 +565,31 @@ if __name__ == "__main__":
             userpass = loadconf(getUserpass)
             flow = checkflow(userpass)
             if type(flow) is type(tuple()):
-                self.Dialog(lzuauto_text['TITLE_FLOW'], lzuauto_text['MSG_FLOW'] % flow)
+                self.Dialog(lzuauto_text['TITLE_FLOW'],
+                    lzuauto_text['MSG_FLOW'] % flow)
             elif flow is 1:
-                self.Dialog(lzuauto_text['TITLE_ERR'], lzuauto_text['ERR_OCR'], icon = gtk.MESSAGE_ERROR)
+                self.Dialog(lzuauto_text['TITLE_ERR'],
+                    lzuauto_text['ERR_OCR'], icon=gtk.MESSAGE_ERROR)
                 sys.exit(4)
             elif flow is 5:
-                self.Dialog(lzuauto_text['TITLE_ERR'], lzuauto_text['ERROR_IO'], icon = gtk.MESSAGE_ERROR)
+                self.Dialog(lzuauto_text['TITLE_ERR'],
+                    lzuauto_text['ERROR_IO'], icon=gtk.MESSAGE_ERROR)
             elif flow is 6:
-                self.Dialog(lzuauto_text['TITLE_ERR'], lzuauto_text['ERR_DJPEG'], icon = gtk.MESSAGE_ERROR)
+                self.Dialog(lzuauto_text['TITLE_ERR'],
+                    lzuauto_text['ERR_DJPEG'], icon=gtk.MESSAGE_ERROR)
             elif flow is 7:
-                self.Dialog(lzuauto_text['TITLE_ERR'], lzuauto_text['ERR_TESSERACT'], icon = gtk.MESSAGE_ERROR)
+                self.Dialog(lzuauto_text['TITLE_ERR'],
+                    lzuauto_text['ERR_TESSERACT'], icon=gtk.MESSAGE_ERROR)
             else:
                 try:
                     if type(flow) is type(unicode()):
-                        self.Dialog(main.lzuauto_text['TITLE_ERR'], flow, 'error')
+                        self.Dialog(lzuauto_text['TITLE_ERR'], flow, 'error')
                 except:
                     if type(flow) is type(str()):
-                        self.Dialog(main.lzuauto_text['TITLE_ERR'], flow, 'error')
-                        
-        def Dialog(self, title, data=None, icon = gtk.MESSAGE_INFO):
-            dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, icon, 
+                        self.Dialog(lzuauto_text['TITLE_ERR'], flow, 'error')
+
+        def Dialog(self, title, data=None, icon=gtk.MESSAGE_INFO):
+            dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, icon,
                                        gtk.BUTTONS_NONE, data)
             dialog.set_position(gtk.WIN_POS_CENTER)
             dialog.set_title(title)
@@ -587,7 +604,7 @@ if __name__ == "__main__":
         def About(self, widget):
             about = gtk.AboutDialog()
             about.set_program_name("lzuauto")
-            about.set_version('%s.%s' % (__version__, 
+            about.set_version('%s.%s' % (__version__,
             __revision__.split(':')[1][:-1].strip()))
             about.set_copyright("(c)ysjdxcn & Kder")
             about.set_license('GNU General Public License v3')
@@ -602,9 +619,9 @@ if __name__ == "__main__":
             about.set_position(gtk.WIN_POS_CENTER)
             about.run()
             about.destroy()
-        
+
         def Usage(self, widget):
-            dialog = gtk.Dialog(lzuauto_text['TITLE_USAGE'], None, 
+            dialog = gtk.Dialog(lzuauto_text['TITLE_USAGE'], None,
             gtk.DIALOG_DESTROY_WITH_PARENT, (gtk.STOCK_OK, gtk.RESPONSE_OK))
             data = "%s" % __doc__
             buffer = gtk.TextBuffer()
@@ -616,11 +633,11 @@ if __name__ == "__main__":
             textview.show()
             dialog.run()
             dialog.destroy()
-            
+
         def __init__(self):
             win = gtk.Window(gtk.WINDOW_TOPLEVEL)
             win.connect('destroy', lambda wid: gtk.main_quit())
-            win.connect('delete_event', lambda a1,a2:gtk.main_quit())
+            win.connect('delete_event', lambda a1, a2: gtk.main_quit())
             win.set_title('兰州大学上网认证工具')
             win.set_size_request(240, 120)
             win.set_position(gtk.WIN_POS_CENTER)
@@ -634,17 +651,18 @@ if __name__ == "__main__":
             win.add_accel_group(accelgroup)
             actiongroup = gtk.ActionGroup('UIManagerExample')
             self.actiongroup = actiongroup
-            actiongroup.add_actions([('Quit', gtk.STOCK_QUIT, '退出(_Q)',
-                                       None, '退出', self.DestroyAll),
-                                      ('About', gtk.STOCK_ABOUT, '关于(_A)',
-                                       None, lzuauto_text['TITLE_ABOUT'], self.About),
-                                      ('Usage', gtk.STOCK_INFO, '用法(_U)',
-                                       None, lzuauto_text['TITLE_USAGE'], self.Usage),
-                                      ('Userpass', gtk.STOCK_DIALOG_AUTHENTICATION, '账号(_U)',
-                                       None, lzuauto_text['TITLE_USAGE'], getUserpass),
-                                     ('File', gtk.STOCK_FILE, '文件(_F)'),
-                                     ('Settings', gtk.STOCK_PROPERTIES, '设置(_S)'),
-                                     ('Help', gtk.STOCK_HELP, '帮助(_H)'),
+            actiongroup.add_actions(
+            [('Quit', gtk.STOCK_QUIT, '退出(_Q)',
+               None, '退出', self.DestroyAll),
+             ('About', gtk.STOCK_ABOUT, '关于(_A)',
+               None, lzuauto_text['TITLE_ABOUT'], self.About),
+             ('Usage', gtk.STOCK_INFO, '用法(_U)',
+               None, lzuauto_text['TITLE_USAGE'], self.Usage),
+             ('Userpass', gtk.STOCK_DIALOG_AUTHENTICATION, '账号(_U)',
+               None, lzuauto_text['TITLE_USAGE'], getUserpass),
+             ('File', gtk.STOCK_FILE, '文件(_F)'),
+             ('Settings', gtk.STOCK_PROPERTIES, '设置(_S)'),
+             ('Help', gtk.STOCK_HELP, '帮助(_H)'),
                                      ])
             actiongroup.get_action('Quit').set_property('short-label', '_Quit')
 
@@ -654,11 +672,12 @@ if __name__ == "__main__":
             main_vbox.pack_start(menubar, False)
 
             image = []
-            stocks = [gtk.STOCK_CONNECT, gtk.STOCK_DISCONNECT, gtk.STOCK_INFO, 
+            stocks = [gtk.STOCK_CONNECT, gtk.STOCK_DISCONNECT, gtk.STOCK_INFO,
                       gtk.STOCK_QUIT]
             button = []
             button_label = ["登录外网", "退出外网", "查询流量", "退出程序"]
-            actions = [self.login, self.logout, self.checkflow, self.DestroyAll]
+            actions = [self.login, self.logout, self.checkflow,
+                        self.DestroyAll]
             for i in range(4):
                 image.append(gtk.Image())
                 button.append(gtk.Button(button_label[i]))
@@ -675,10 +694,10 @@ if __name__ == "__main__":
             main_hbox1.pack_start(button[2], True, True, 10)
             main_hbox2.pack_start(button[1], True, True, 10)
             main_hbox2.pack_start(button[3], True, True, 10)
-                                                          
+
             main_vbox.pack_start(main_hbox1, True, True, 10)
             main_vbox.pack_start(main_hbox2, True, True, 10)
-            
+
     #        table = gtk.Table(2, 2, True)
     #        table.set_size_request(190, 110)
     #        table.attach(button1,0,1,0,1,gtk.FILL, gtk.FILL, 0, 0)
@@ -686,7 +705,7 @@ if __name__ == "__main__":
     #        table.attach(button3,1,2,0,1,gtk.FILL, gtk.FILL, 0, 0)
     #        table.attach(button4,1,2,1,2,gtk.FILL, gtk.FILL, 0, 0)
     #        win.add(table)
-            
+
             win.add(main_vbox)
             win.modify_font(pango.FontDescription("sans 9"))
             win.show_all()
@@ -701,28 +720,25 @@ if __name__ == "__main__":
             gtk.MESSAGE_QUESTION,
             gtk.BUTTONS_OK_CANCEL,
             None)
-        
+
         dialog.set_default_response(gtk.RESPONSE_OK)
-        
+
         # dialog.set_markup('请输入 <b>账号和密码</b>:')
         dialog.set_markup('请输入账号和密码:')
         # dialog.format_secondary_markup("<i>只需首次运行和要修改密码时输入</i>")
         dialog.format_secondary_markup("(只需首次运行和要修改密码时输入)")
-        
-        
-        
         #create the text input field
         entry = gtk.Entry()
-        
         entry_pass = gtk.Entry()
         entry_pass.set_visibility(False)
-        
+
         userpass = readconf()
         if userpass is not 8:
             entry.set_text(userpass[0])
             entry_pass.set_text(userpass[1])
         #allow the user to press enter to do ok
-        entry_pass.connect("activate", responseToDialog, dialog, gtk.RESPONSE_OK)
+        entry_pass.connect("activate", responseToDialog, dialog,
+                            gtk.RESPONSE_OK)
         #create a horizontal box to pack the entry and a label
         hbox1 = gtk.HBox()
         hbox2 = gtk.HBox()
@@ -741,11 +757,10 @@ if __name__ == "__main__":
         if response == gtk.RESPONSE_OK:
             userpass = (entry.get_text(), entry_pass.get_text())
             if '' not in userpass:
-                with open(CONF,'w') as f:
+                with open(CONF, 'w') as f:
                     f.write('%s %s' % userpass)
         dialog.destroy()
         return userpass
-
 
     start = Interface()
     loadconf(getUserpass)
