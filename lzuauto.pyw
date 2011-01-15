@@ -60,9 +60,10 @@ class Application(tk.Frame):
         if result is 1 or 'M)' in result:
 #            print(type(main.lzuauto_text['MSG_LOGIN']),type(result))
             self.Dialog(main.lzuauto_text['TITLE_LOGIN'], main.lzuauto_text['MSG_LOGIN'] % result)
+        elif main.TFMMSG['find1'] in result:
+            self.Dialog(main.lzuauto_text['TITLE_LOGIN'], main.TFMMSG[15] + result)
         else:
-            self.Dialog(main.lzuauto_text['TITLE_LOGIN'], result)
-            # self.Dialog(main.lzuauto_text['TITLE_ERR'], result, 'error')
+            self.Dialog(main.lzuauto_text['TITLE_ERR'], result, 'error')
  
     def logout(self, evt=None):
         if main.logout():

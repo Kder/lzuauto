@@ -85,6 +85,25 @@ lzuauto_text = {
 'TITLE_ERR': '错误',
 'TITLE_FLOW': '流量查询',
 }
+TFMMSG = {0: '',
+          2: "该账号正在使用中，请您与网管联系 !!!\n",
+          3: "本帐号只能在指定地址使用\n",  # :+pp+xip
+          4: "本帐号费用超支\n",
+          5: "本帐号暂停使用\n",
+          6: "System buffer full\n",
+          #7: UT+UF+UM,
+          8: "本帐号正在使用,不能修改\n",
+          9: "新密码与确认新密码不匹配,不能修改\n",
+          10: "密码修改成功\n",
+          11: "本帐号只能在指定地址使用\n",  # :+pp+mac
+          14: "注销成功 Logout successfully\n",
+          15: "登录成功 Login successfully\n",
+          'error0': "本 IP 不允许Web方式登录\n",
+          'error1': "本帐号不允许Web方式登录\n",
+          'error2': "本帐号不允许修改密码\n",
+          'error_userpass': '帐号或密码不对，请重新输入\n',
+          'find1': '本帐号',
+}
 option = "alert\((.*?)\);"
 # option = "'\(.*?\)'"
 option1 = '<td bgcolor=\"FFFBF0\" align=\"center\" colspan=5>(.*?)MB'
@@ -105,6 +124,9 @@ if sys.version_info.major is 2:
     isPy2 = True
     for i in lzuauto_text:
         lzuauto_text[i] = unicode(lzuauto_text[i], 'utf-8')
+    for i in TFMMSG:
+        TFMMSG[i] = unicode(TFMMSG[i], 'utf-8')
+        
 
 def readconf():
     if os.path.exists(CONF):
@@ -235,12 +257,30 @@ def get_http_res(host, path, params=None, headers=None):
     return data
 
 
+def DispTFM(Msg, msga):
+    if int(Msg) == 1:
+        if msga != '':
+            try:
+                return(TFMMSG[msga])
+            except KeyError:
+                return(msga + '\n')
+        else:
+            return(TFMMSG['error_userpass'])
+    else:
+        return(TFMMSG[int(Msg)])
+
+
 def process_ret(ret):
     msg = re.findall("Msg=([\d.]+);", ret)
     msga = re.findall("msga='(.*)'", ret)
+    # print msg,msga,ret
+    msg1 = ''
     if msg != [] and msga != []:
-        if DispTFM(msg[0], msga[0]) != 0:
-            return -1
+        msg1 = DispTFM(msg[0], msga[0])
+        if msg1 == TFMMSG['error_userpass']:
+            return msg1
+        # if DispTFM(msg[0], msga[0]) != 0:
+            # return -1
     flow = re.findall("flow='([\d.]+)\s*'", ret)
     time = re.findall("time='([\d.]+)\s*'", ret)
     if flow != [] and time != []:
@@ -259,9 +299,9 @@ def process_ret(ret):
         flow_mb = flow / 1024 % 1024 + flow % 1024 / 1024.0
         time_flow = lzuauto_text['DRCOM_MSG_TIME'] % (days, hours, minutes) + \
         lzuauto_text['DRCOM_MSG_FLOW'] % (flow_tb, flow_gb, flow_mb)
-        return time_flow
     else:
-        return ret
+        time_flow = ''
+    return msg1 + time_flow
     
     
 def login(userpass):
@@ -273,9 +313,12 @@ def login(userpass):
         "Accept": "text/plain",
         'Referer': 'http://10.10.0.202/'
         }
-    get_http_res('10.10.0.202', '/', params, headers)
-    data = get_http_res('10.10.0.202', '/', headers=headers)
-    return process_ret(data)
+    data = get_http_res('10.10.0.202', '/', params, headers)
+    ret = process_ret(data)
+    if len(ret) == 0:
+        data = get_http_res('10.10.0.202', '/', headers=headers)
+        ret = process_ret(data)
+    return ret
 
 
 def logout():
