@@ -45,7 +45,7 @@ __status__ = 'Release'
 __projecturl__ = 'http://code.google.com/p/lzuauto/'
 
 __revision__ = "$Revision: 87 $"
-__version__ = '1.3.0'
+__version__ = '1.3.1'
 __date__ = '$Date: 2010-10-22 17:53:48 +0800 (星期五, 2010-10-22)$'
 
 import os
@@ -219,6 +219,18 @@ def get_ip():
         return get_ip_address('eth0')
 
 ip = get_ip()[0]
+
+
+def get_http_res(host, path, params=None, headers=None):
+    conn = http.HTTPConnection(host)
+    if params:
+        conn.request('POST', path, params, headers)
+    else:
+        conn.request('GET', path, headers=headers)
+    response = conn.getresponse()
+    data = response.read().decode('gb2312')
+    conn.close()
+    return data
     
 def login(userpass):
     (userid, passwd) = userpass
@@ -227,11 +239,7 @@ def login(userpass):
     'chal_id':'','chal_vector':'','seq_id':'','req_id':''})
     headers = {"Content-type": "application/x-www-form-urlencoded", 
     "Accept": "text/plain"}
-    conn = http.HTTPConnection("202.201.1.140")
-    conn.request("POST", "/portalAuthAction.do", params, headers)
-    response = conn.getresponse()
-    data = response.read().decode('gb2312')
-    conn.close()
+    data = get_http_res("202.201.1.140", "/portalAuthAction.do", params, headers)
     #print data
     result = re.findall(option, data)
     if len(result)>0:
@@ -331,25 +339,13 @@ def ocr(data):
     
 
 def verify(userpass, headers):
-
     (userid, passwd) = userpass
-    conn1 = http.HTTPConnection("a.lzu.edu.cn")
-    conn1.request('GET', '/servlet/AuthenCodeImage', headers = headers)
-    response1 = conn1.getresponse()
-    #print response1.getheaders()
-    data = response1.read()
-    conn1.close()
+    data = get_http_res('a.lzu.edu.cn', '/servlet/AuthenCodeImage', headers = headers)
     s = ocr(data)
     if type(s) is not type(str()):
         return s
-    conn2 = http.HTTPConnection("a.lzu.edu.cn")
     params = urlparse.urlencode({'user_id':userid,'passwd':passwd,'validateCode':s})
-    #print params
-    conn2.request('POST', '/selfLogonAction.do', params, headers = headers)
-    response2 = conn2.getresponse()
-    data = response2.read().decode('gb2312')
-    conn2.close()
-    
+    data = get_http_res('a.lzu.edu.cn', '/selfLogonAction.do', params, headers)
     err = re.findall(option3, data)
 #    if 'selfLogon' in response2.getheaders()[3][1]:
 #    print(err)
@@ -365,7 +361,7 @@ rv:1.9.2.10)Gecko/20101020 Firefox/3.6.11",
 */*;q=0.8",
     "Keep-Alive":"115",
     "Connection":"keep-alive"}
-    
+
     conn = http.HTTPConnection("a.lzu.edu.cn")
     conn.request('GET', '/', headers = headers)
     response = conn.getresponse()
@@ -375,11 +371,7 @@ rv:1.9.2.10)Gecko/20101020 Firefox/3.6.11",
     headers.update(temp)
     conn.close()
 
-    conn0 = http.HTTPConnection("a.lzu.edu.cn")
-    conn0.request('GET', '/selfLogon.do', headers = headers)
-    response0 = conn0.getresponse()
-    #print response0.getheaders()
-    conn0.close()
+    get_http_res("a.lzu.edu.cn", '/selfLogon.do', headers=headers)
 
     for i in range(5):
         res = verify((userid, passwd), headers)
@@ -391,19 +383,9 @@ rv:1.9.2.10)Gecko/20101020 Firefox/3.6.11",
         else:
             return res[0] + '\n' + lzuauto_text['ERR_AUTH']
 
-    conn3 = http.HTTPConnection("a.lzu.edu.cn")
-    conn3.request('GET', '/selfIndexAction.do',headers = headers)
-    response3 = conn3.getresponse()
-    data = response3.read()
-#    print data
-    conn3.close()
+    get_http_res("a.lzu.edu.cn", '/selfIndexAction.do', headers=headers)
+    data = get_http_res("a.lzu.edu.cn", '/userQueryAction.do', headers=headers)
 
-    conn4 = http.HTTPConnection("a.lzu.edu.cn")
-    conn4.request('GET', '/userQueryAction.do',headers = headers)
-    response4 = conn4.getresponse()
-    data = response4.read().decode('gb2312')
-    conn4.close()
-#    print data[0]
     mb = re.findall(option1,data)
     hour = re.findall(option2,data)
 
