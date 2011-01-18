@@ -52,15 +52,16 @@ import os
 import sys
 import subprocess
 import time
+import traceback
+import string
+import re
+import random
 try:
     import urllib.parse as urlparse
     import http.client as http
 except:
     import urllib as urlparse
     import httplib as http
-import string
-import re
-import random
 
 
 CHK_COUNT = 0
@@ -73,6 +74,8 @@ lzuauto_text = {
 'ERR_DJPEG': 'djpeg错误，请确认libjpeg是否正确安装且djpeg命令可用',
 'ERR_IO': '文件写入错误，请确认程序所在目录有读写权限',
 'ERR_CODECHECK': '验证码错误，请重新提交。',
+'ERR_OP': '操作过快，服务器还没反应过来呢，请等会再试\n',
+'ERR_CONNECTION': '网络连接错误（网线没接好或网络连接受限）\n',
 'MSG_FLOW': '您本月已经使用的流量为 %s MB\n您本月已经上网 %s 小时',
 'DRCOM_MSG_TIME': '本帐号已使用时间: %d天 %d小时 %d分钟\n',
 'DRCOM_MSG_FLOW':  '本帐号已使用流量: %dT %dG %.3fM Bytes\n',
@@ -246,14 +249,24 @@ ip = get_ip()[0]
 
 
 def get_http_res(host, path, params=None, headers=None):
-    conn = http.HTTPConnection(host)
-    if params:
-        conn.request('POST', path, params, headers)
-    else:
-        conn.request('GET', path, headers=headers)
-    response = conn.getresponse()
-    data = response.read().decode('gb2312')
-    conn.close()
+    try:
+        conn = http.HTTPConnection(host)
+        if params:
+            conn.request('POST', path, params, headers)
+        else:
+            conn.request('GET', path, headers=headers)
+        response = conn.getresponse()
+        data = response.read().decode('gbk')
+        conn.close()
+    except:
+        exctype, value = sys.exc_info()[:2]
+        exception = traceback.format_exception_only(exctype, value)
+        # print(exception[0])
+        if '10054' in exception[0]:
+            return lzuauto_text['ERR_OP']
+        if '10060' in exception[0] or '10065' in exception[0] or \
+                '11001' in exception[0]:
+            return lzuauto_text['ERR_CONNECTION']
     return data
 
 
@@ -311,6 +324,8 @@ def login(userpass):
     if len(ret) == 0:
         data = get_http_res('10.10.0.210', '/', headers=headers)
         ret = process_ret(data)
+        if len(ret) == 0:
+            return data
     return ret
 
 
@@ -320,7 +335,11 @@ def logout():
         'Referer': 'http://10.10.0.210:9002/0'
         }
     data = get_http_res('10.10.0.210', '/F.htm', headers=headers)
-    return 1
+    ret = process_ret(data)
+    if len(ret) == 0:
+        return data
+    else:
+        return ret
 
 
 # def login(userpass):

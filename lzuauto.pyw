@@ -68,10 +68,12 @@ class Application(tk.Frame):
             self.Dialog(LATXT['TITLE_ERR'], result, 'error')
 
     def logout(self, evt=None):
-        if main.logout():
-            self.Dialog(LATXT['TITLE_LOGOUT'], LATXT['MSG_LOGOUT'])
-        else:
-            self.logout
+        result = main.logout()
+        self.Dialog(LATXT['TITLE_LOGOUT'], result)
+        # if :
+            # self.Dialog(LATXT['TITLE_LOGOUT'], LATXT['MSG_LOGOUT'])
+        # else:
+            # self.logout
 
     def checkflow(self, evt=None):
         userpass = main.loadconf(getUserpass)
