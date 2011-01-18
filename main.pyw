@@ -279,18 +279,11 @@ def process_ret(ret):
         msg1 = DispTFM(msg[0], msga[0])
         if msg1 == TFMMSG['error_userpass']:
             return msg1
-        # if DispTFM(msg[0], msga[0]) != 0:
-            # return -1
     flow = re.findall("flow='([\d.]+)\s*'", ret)
     time = re.findall("time='([\d.]+)\s*'", ret)
     if flow != [] and time != []:
         time = int(time[0])  # unit is minute
         flow = int(flow[0])  # unit is kbyte
-#        flow0=flow % 1024; flow1=flow - flow0; flow0 = flow0 * 1000;
-#        flow0 = flow0 - flow0 % 1024
-#        flow0 = (flow % 1024) * 1000 - ((flow % 1024) * 1000) % 1024
-#        flow_kb = flow - flow % 1024
-#        flow0mb = flow % 1024 / 1024.0
         days = time / 60 / 24
         hours = time / 60 % 24
         minutes = time % 60
@@ -311,12 +304,12 @@ def login(userpass):
             'v6ip': ''})
     headers = {"Content-type": "application/x-www-form-urlencoded",
         "Accept": "text/plain",
-        'Referer': 'http://10.10.0.202/'
+        'Referer': 'http://10.10.0.210/'
         }
-    data = get_http_res('10.10.0.202', '/', params, headers)
+    data = get_http_res('10.10.0.210', '/', params, headers)
     ret = process_ret(data)
     if len(ret) == 0:
-        data = get_http_res('10.10.0.202', '/', headers=headers)
+        data = get_http_res('10.10.0.210', '/', headers=headers)
         ret = process_ret(data)
     return ret
 
@@ -324,9 +317,9 @@ def login(userpass):
 def logout():
     headers = {"Content-type": "application/x-www-form-urlencoded",
         "Accept": "text/plain",
-        'Referer': 'http://10.10.0.202:9002/0'
+        'Referer': 'http://10.10.0.210:9002/0'
         }
-    data = get_http_res('10.10.0.202', '/F.htm', headers=headers)
+    data = get_http_res('10.10.0.210', '/F.htm', headers=headers)
     return 1
 
 
