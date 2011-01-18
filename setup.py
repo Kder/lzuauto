@@ -67,9 +67,9 @@ setup(name = 'lzuauto-gtk',
 
 base_files = [
 'conf.txt',
-'tesseract.exe',
-'leptonlib.dll',
-'tessdata',
+#'tesseract.exe',
+#'leptonlib.dll',
+#'tessdata',
 ]
 
 #begin to pack
@@ -95,10 +95,12 @@ try:
 
     os.system('7z a -xr!*.svn* lzuauto-%s.%s-src.zip %s' % \
                 (version, revision, src_args))
-    os.system('7z a -xr!*.svn* lzuauto-%s.%s-win-gtk.zip lzuauto-gtk' % (version, revision))
+    os.system('7z a -xr!*.svn* -xr!*/tessdata -xr!*/leptonlib.dll \
+-xr!*/tesseract.exe lzuauto-%s.%s-win-gtk.zip lzuauto-gtk' % 
+        (version, revision))
+
 except Exception,e:
     sys.stderr.write(str(e))
-    sys.stderr.write('Error.')
     sys.stderr.write('Please make sure upx and 7z are in system path.')
     sys.exit(-1)
 
@@ -108,9 +110,9 @@ except Exception,e:
 
 tk_files = [
 'lzuauto-tk/conf.txt',
-'lzuauto-tk/tesseract.exe',
-'lzuauto-tk/leptonlib.dll',
-'lzuauto-tk/tessdata',
+#'lzuauto-tk/tesseract.exe',
+#'lzuauto-tk/leptonlib.dll',
+#'lzuauto-tk/tessdata',
 'lzuauto-tk/lzuauto.exe',
 'lzuauto-tk/python27.dll',
 'lzuauto-tk/library.zip',
