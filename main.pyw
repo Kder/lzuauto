@@ -555,47 +555,47 @@ if __name__ == "__main__":
             userpass = loadconf(get_userpass)
             result = login(userpass)
             if result is 1 or 'M)' in result:
-                self.Dialog(lzuauto_text['TITLE_LOGIN'],
+                self.dialog(lzuauto_text['TITLE_LOGIN'],
                     lzuauto_text['MSG_LOGIN'] % result)
             elif TFMMSG['find1'] in result:
-                self.Dialog(lzuauto_text['TITLE_LOGIN'],
+                self.dialog(lzuauto_text['TITLE_LOGIN'],
                     TFMMSG[15] + result)
             else:
-                self.Dialog(lzuauto_text['TITLE_ERR'], result,
+                self.dialog(lzuauto_text['TITLE_ERR'], result,
                     icon=gtk.MESSAGE_ERROR)
 
         def logout(self, widget, data=None):
             result = logout()
-            self.Dialog(lzuauto_text['TITLE_LOGOUT'], result)
+            self.dialog(lzuauto_text['TITLE_LOGOUT'], result)
 
         def checkflow(self, widget, data=None):
             userpass = loadconf(get_userpass)
             flow = checkflow(userpass)
             if type(flow) is type(tuple()):
-                self.Dialog(lzuauto_text['TITLE_FLOW'],
+                self.dialog(lzuauto_text['TITLE_FLOW'],
                     lzuauto_text['MSG_FLOW'] % flow)
             elif flow is 1:
-                self.Dialog(lzuauto_text['TITLE_ERR'],
+                self.dialog(lzuauto_text['TITLE_ERR'],
                     lzuauto_text['ERR_OCR'], icon=gtk.MESSAGE_ERROR)
                 sys.exit(4)
             elif flow is 5:
-                self.Dialog(lzuauto_text['TITLE_ERR'],
+                self.dialog(lzuauto_text['TITLE_ERR'],
                     lzuauto_text['ERROR_IO'], icon=gtk.MESSAGE_ERROR)
             elif flow is 6:
-                self.Dialog(lzuauto_text['TITLE_ERR'],
+                self.dialog(lzuauto_text['TITLE_ERR'],
                     lzuauto_text['ERR_DJPEG'], icon=gtk.MESSAGE_ERROR)
             elif flow is 7:
-                self.Dialog(lzuauto_text['TITLE_ERR'],
+                self.dialog(lzuauto_text['TITLE_ERR'],
                     lzuauto_text['ERR_TESSERACT'], icon=gtk.MESSAGE_ERROR)
             else:
                 try:
                     if type(flow) is type(unicode()):
-                        self.Dialog(lzuauto_text['TITLE_ERR'], flow, 'error')
+                        self.dialog(lzuauto_text['TITLE_ERR'], flow, 'error')
                 except:
                     if type(flow) is type(str()):
-                        self.Dialog(lzuauto_text['TITLE_ERR'], flow, 'error')
+                        self.dialog(lzuauto_text['TITLE_ERR'], flow, 'error')
 
-        def Dialog(self, title, data=None, icon=gtk.MESSAGE_INFO):
+        def dialog(self, title, data=None, icon=gtk.MESSAGE_INFO):
             dialog = gtk.MessageDialog(None, gtk.DIALOG_MODAL, icon,
                                        gtk.BUTTONS_NONE, data)
             dialog.set_position(gtk.WIN_POS_CENTER)
@@ -605,10 +605,10 @@ if __name__ == "__main__":
             dialog.run()
             dialog.destroy()
 
-        def DestroyAll(self, widget, data=None):
+        def destroy_all(self, widget, data=None):
             gtk.main_quit()
 
-        def About(self, widget):
+        def about(self, widget):
             about = gtk.AboutDialog()
             about.set_program_name("lzuauto")
             about.set_version('%s.%s' % (__version__,
@@ -627,7 +627,7 @@ if __name__ == "__main__":
             about.run()
             about.destroy()
 
-        def Usage(self, widget):
+        def usage(self, widget):
             dialog = gtk.Dialog(lzuauto_text['TITLE_USAGE'], None,
             gtk.DIALOG_DESTROY_WITH_PARENT, (gtk.STOCK_OK, gtk.RESPONSE_OK))
             data = "%s" % __doc__
@@ -661,11 +661,11 @@ if __name__ == "__main__":
             self.actiongroup = actiongroup
             actiongroup.add_actions(
             [('Quit', gtk.STOCK_QUIT, '退出(_Q)',
-               None, '退出', self.DestroyAll),
+               None, '退出', self.destroy_all),
              ('About', gtk.STOCK_ABOUT, '关于(_A)',
-               None, lzuauto_text['TITLE_ABOUT'], self.About),
+               None, lzuauto_text['TITLE_ABOUT'], self.about),
              ('Usage', gtk.STOCK_INFO, '用法(_U)',
-               None, lzuauto_text['TITLE_USAGE'], self.Usage),
+               None, lzuauto_text['TITLE_USAGE'], self.usage),
              ('Userpass', gtk.STOCK_DIALOG_AUTHENTICATION, '账号(_U)',
                None, lzuauto_text['TITLE_USAGE'], get_userpass),
              ('File', gtk.STOCK_FILE, '文件(_F)'),
@@ -685,7 +685,7 @@ if __name__ == "__main__":
             button = []
             button_label = ["登录外网", "退出外网", "查询流量", "退出程序"]
             actions = [self.login, self.logout, self.checkflow,
-                        self.DestroyAll]
+                        self.destroy_all]
             for i in range(4):
                 image.append(gtk.Image())
                 button.append(gtk.Button(button_label[i]))
@@ -719,7 +719,7 @@ if __name__ == "__main__":
             win.show_all()
 
     def get_userpass(widget):
-        def responseToDialog(entry, dialog, response):
+        def response_to_dialog(entry, dialog, response):
             dialog.response(response)
         #base this on a message dialog
         dialog = gtk.MessageDialog(
@@ -728,7 +728,7 @@ if __name__ == "__main__":
             gtk.MESSAGE_QUESTION,
             gtk.BUTTONS_OK_CANCEL,
             None)
-
+        # dialog.modify_font(pango.FontDescription("sans 9"))
         dialog.set_default_response(gtk.RESPONSE_OK)
 
         # dialog.set_markup('请输入 <b>账号和密码</b>:')
@@ -745,7 +745,7 @@ if __name__ == "__main__":
             entry.set_text(userpass[0])
             entry_pass.set_text(userpass[1])
         #allow the user to press enter to do ok
-        entry_pass.connect("activate", responseToDialog, dialog,
+        entry_pass.connect("activate", response_to_dialog, dialog,
                             gtk.RESPONSE_OK)
         #create a horizontal box to pack the entry and a label
         hbox1 = gtk.HBox()

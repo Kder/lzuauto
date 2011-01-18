@@ -53,62 +53,62 @@ __author__ = '$Author$'
 LATXT = main.lzuauto_text
 
 
-class Application(tk.Frame):
+class LzuautoUI(tk.Frame):
 
     def login(self, evt=None):
-        userpass = main.loadconf(getUserpass)
+        userpass = main.loadconf(get_userpass)
         # print(type(userpass))
         result = main.login(userpass)
         if result is 1 or 'M)' in result:
 #            print(type(LATXT['MSG_LOGIN']), type(result))
-            self.Dialog(LATXT['TITLE_LOGIN'], LATXT['MSG_LOGIN'] % result)
+            self.dialog(LATXT['TITLE_LOGIN'], LATXT['MSG_LOGIN'] % result)
         elif main.TFMMSG['find1'] in result:
-            self.Dialog(LATXT['TITLE_LOGIN'], main.TFMMSG[15] + result)
+            self.dialog(LATXT['TITLE_LOGIN'], main.TFMMSG[15] + result)
         else:
-            self.Dialog(LATXT['TITLE_ERR'], result, 'error')
+            self.dialog(LATXT['TITLE_ERR'], result, 'error')
 
     def logout(self, evt=None):
         result = main.logout()
-        self.Dialog(LATXT['TITLE_LOGOUT'], result)
+        self.dialog(LATXT['TITLE_LOGOUT'], result)
         # if :
-            # self.Dialog(LATXT['TITLE_LOGOUT'], LATXT['MSG_LOGOUT'])
+            # self.dialog(LATXT['TITLE_LOGOUT'], LATXT['MSG_LOGOUT'])
         # else:
             # self.logout
 
     def checkflow(self, evt=None):
-        userpass = main.loadconf(getUserpass)
+        userpass = main.loadconf(get_userpass)
         flow = main.checkflow(userpass)
         if type(flow) is type(tuple()):
-            self.Dialog(LATXT['TITLE_FLOW'], LATXT['MSG_FLOW'] % flow)
+            self.dialog(LATXT['TITLE_FLOW'], LATXT['MSG_FLOW'] % flow)
         elif flow is 1:
-            self.Dialog(LATXT['TITLE_ERR'], LATXT['ERR_OCR'], 'error')
+            self.dialog(LATXT['TITLE_ERR'], LATXT['ERR_OCR'], 'error')
             sys.exit(4)
         elif flow is 5:
-            self.Dialog(LATXT['TITLE_ERR'], LATXT['ERROR_IO'], 'error')
+            self.dialog(LATXT['TITLE_ERR'], LATXT['ERROR_IO'], 'error')
         elif flow is 6:
-            self.Dialog(LATXT['TITLE_ERR'], LATXT['ERR_DJPEG'], 'error')
+            self.dialog(LATXT['TITLE_ERR'], LATXT['ERR_DJPEG'], 'error')
         elif flow is 7:
-            self.Dialog(LATXT['TITLE_ERR'], LATXT['ERR_TESSERACT'], 'error')
+            self.dialog(LATXT['TITLE_ERR'], LATXT['ERR_TESSERACT'], 'error')
         else:
             try:
                 if type(flow) is type(unicode()):
-                    self.Dialog(LATXT['TITLE_ERR'], flow, 'error')
+                    self.dialog(LATXT['TITLE_ERR'], flow, 'error')
             except:
                 if type(flow) is type(str()):
-                    self.Dialog(LATXT['TITLE_ERR'], flow, 'error')
+                    self.dialog(LATXT['TITLE_ERR'], flow, 'error')
 
-    def Dialog(self, title=None, data=None, icon='info'):
+    def dialog(self, title=None, data=None, icon='info'):
         tkmsg.showinfo(title, data, icon=icon)
 
-    def About(self, event=None):
-        self.Dialog(LATXT['TITLE_ABOUT'], "lzuauto %s.%s\n作者： ysjdxcn & Kder\n\
+    def about(self, event=None):
+        self.dialog(LATXT['TITLE_ABOUT'], "lzuauto %s.%s\n作者： ysjdxcn & Kder\n\
 项目主页： http://code.google.com/p/lzuauto/ \nLicense : GPLv3" %
         (main.__version__, main.__revision__.split(':')[1][:-1].strip()))
 
-    def Usage(self, event=None):
+    def usage(self, event=None):
         #a class from idlelib
-        class TextViewer(tk.Toplevel):
-            """A simple text viewer dialog for IDLE
+        class _TextViewer(tk.Toplevel):
+            """A simple text viewer dialog
 
             """
             def __init__(self, parent, title, text):
@@ -121,83 +121,73 @@ class Application(tk.Frame):
                 #elguavas - config placeholders til config stuff completed
                 self.bg = '#ffffff'
                 self.fg = '#000000'
-
-                self.CreateWidgets()
+                self.createwidgets()
                 self.title(title)
                 self.transient(parent)
                 self.grab_set()
-                self.protocol("WM_DELETE_WINDOW", self.Ok)
+                self.protocol("WM_DELETE_WINDOW", self.ok)
                 self.parent = parent
-                self.textView.focus_set()
-                #key bindings for this dialog
-                self.bind('<Return>', self.Ok)
-                self.bind('<Escape>', self.Ok)
-                self.textView.insert(0.0, text)
-#                self.textView.config(state=tk.DISABLED)
+                self.textview.focus_set()
+                self.bind('<Return>', self.ok)
+                self.bind('<Escape>', self.ok)
+                self.textview.insert(0.0, text)
                 self.withdraw()
                 self.update()
 #                x, y = (self.winfo_screenwidth() - self.winfo_reqwidth()) / 2,
 #                    (self.winfo_screenheight() - self.winfo_reqheight()) / 2
                 x, y = ((self.winfo_screenwidth() - self.winfo_width()) / 2,
                     (self.winfo_screenheight() - self.winfo_height()) / 2)
-#                sys.stdout.write(str([self.winfo_width(),
-#                                    self.winfo_height()]))
                 self.geometry('+%d+%d' % (x, y))
                 self.deiconify()
                 self.update()
                 self.wait_window()
 
-            def Ok(self, event=None):
+            def ok(self, event=None):
                 self.destroy()
 
-            def CreateWidgets(self):
-                frameText = tk.Frame(self, relief=tk.SUNKEN, height=700)
-                frameButtons = tk.Frame(self)
-                self.buttonOk = tk.Button(frameButtons, text='OK',
-                                       command=self.Ok, takefocus=tk.FALSE)
-#                self.scrollbarView = tk.Scrollbar(frameText,
-#                orient=tk.VERTICAL, takefocus=tk.FALSE, highlightthickness=0)
-                self.textView = tk.Text(frameText, wrap=tk.WORD,
+            def createwidgets(self):
+                frametext = tk.Frame(self, relief=tk.SUNKEN, height=700)
+                framebuttons = tk.Frame(self)
+                self.button_ok = tk.Button(framebuttons, text='OK',
+                                       command=self.ok, takefocus=tk.FALSE)
+                self.textview = tk.Text(frametext, wrap=tk.WORD,
                     highlightthickness=0, fg=self.fg, bg=self.bg)
-#                self.scrollbarView.config(command=self.textView.yview)
-#                self.textView.config(yscrollcommand=self.scrollbarView.set)
-                self.buttonOk.pack()
-#                self.scrollbarView.pack(side=tk.RIGHT, fill=tk.Y)
-                self.textView.pack(side=tk.LEFT, expand=tk.TRUE, fill=tk.BOTH)
-                frameButtons.pack(side=tk.BOTTOM, fill=tk.X)
-                frameText.pack(side=tk.TOP, expand=tk.TRUE, fill=tk.BOTH)
+                self.button_ok.pack()
+                self.textview.pack(side=tk.LEFT, expand=tk.TRUE, fill=tk.BOTH)
+                framebuttons.pack(side=tk.BOTTOM, fill=tk.X)
+                frametext.pack(side=tk.TOP, expand=tk.TRUE, fill=tk.BOTH)
 
-        tv = TextViewer(self, LATXT['TITLE_USAGE'], __doc__)
+        tv = _TextViewer(self, LATXT['TITLE_USAGE'], __doc__)
 
-    def createWidgets(self):
+    def createwidgets(self):
         ft = tkfont.Font(family='宋体', size=9, weight=tkfont.NORMAL)
 
         # top = self.winfo_toplevel()
-        # self.menuBar = tk.Menu(top)
-        # top["menu"] = self.menuBar
-        self.menuBar = tk.Menu(self)
-        self.master["menu"] = self.menuBar
-        self.subMenu1 = tk.Menu(self.menuBar, tearoff=0, font=ft)
-        self.subMenu2 = tk.Menu(self.menuBar, tearoff=0, font=ft)
-        self.subMenu3 = tk.Menu(self.menuBar, tearoff=0, font=ft)
-        self.menuBar.add_cascade(label="文件(F)", menu=self.subMenu1,
+        # self.menubar = tk.Menu(top)
+        # top["menu"] = self.menubar
+        self.menubar = tk.Menu(self)
+        self.master["menu"] = self.menubar
+        self.submenu1 = tk.Menu(self.menubar, tearoff=0, font=ft)
+        self.submenu2 = tk.Menu(self.menubar, tearoff=0, font=ft)
+        self.submenu3 = tk.Menu(self.menubar, tearoff=0, font=ft)
+        self.menubar.add_cascade(label="文件(F)", menu=self.submenu1,
                                     underline=3)
-        self.subMenu1.add_command(label="退出(X)", command=self.quit,
+        self.submenu1.add_command(label="退出(X)", command=self.quit,
                                     accelerator='Ctrl+Q', underline=3)
-        self.menuBar.add_cascade(label="设置(S)", menu=self.subMenu2,
+        self.menubar.add_cascade(label="设置(S)", menu=self.submenu2,
                                     underline=3)
-        self.subMenu2.add_command(label="账号(A)", command=getUserpass,
+        self.submenu2.add_command(label="账号(A)", command=get_userpass,
                                     underline=3)
-        self.menuBar.add_cascade(label="帮助(H)", menu=self.subMenu3,
+        self.menubar.add_cascade(label="帮助(H)", menu=self.submenu3,
                                     underline=3)
-        self.subMenu3.add_command(label="关于(A)", command=self.About,
+        self.submenu3.add_command(label="关于(A)", command=self.about,
                                     underline=3)
-        self.subMenu3.add_command(label="用法(U)", command=self.Usage,
+        self.submenu3.add_command(label="用法(U)", command=self.usage,
                                     accelerator='F1', underline=3)
 
         buttons = list()
         button_label = ["登录外网", "查询流量", "退出外网", "退出程序"]
-        actions = [self.login, self.checkflow, self.logout, self.Quit]
+        actions = [self.login, self.checkflow, self.logout, self.quit]
         idx = 0
         for bdw in range(2):
             setattr(self, 'of%d' % bdw, tk.Frame(self, borderwidth=0))
@@ -214,7 +204,7 @@ class Application(tk.Frame):
         for i in range(4):
             buttons[i].bind('<Key-Return>', actions[i])
 
-    def Quit(self, event=None):
+    def quit(self, event=None):
         self.destroy()
         root.destroy()
         sys.exit()
@@ -222,7 +212,7 @@ class Application(tk.Frame):
     def __init__(self, master):
         tk.Frame.__init__(self, master)
         self.pack()
-        self.createWidgets()
+        self.createwidgets()
         self.master.title('兰大上网认证系统自动登录工具')
 #        self.master.withdraw()
 #        self.master.Popup()
@@ -237,17 +227,12 @@ class Application(tk.Frame):
         self.master.geometry('+%d+%d' % (self.x, self.y))
         self.master.deiconify()
         self.master.update()
-#        self.master.bind('<Escape>', self.Ok)
-        self.master.bind('<Control-q>', self.Quit)
-        self.master.bind('<F1>', self.Usage)
-#        self.master.bind('<Control-a>', self.About)
-        # self.transient(parent)
-        # self.grab_set()
-        # self.protocol("WM_DELETE_WINDOW", self.Ok)
-        # self.wait_window()
+#        self.master.bind('<Escape>', self.ok)
+        self.master.bind('<Control-q>', self.quit)
+        self.master.bind('<F1>', self.usage)
 
 
-class MyDialog(tk.Frame):
+class UserpassDialog(tk.Frame):
     def __init__(self, master=None):
         global userpass
         tk.Frame.__init__(self, master)
@@ -261,17 +246,15 @@ class MyDialog(tk.Frame):
         l2.grid(row=1, column=0)
         self.e2 = tk.Entry(self, show="*", textvariable=self.v2)
         self.e2.grid(row=1, column=1)
-        self.e2.bind('<Key-Return>', self.Ok)
+        self.e2.bind('<Key-Return>', self.ok)
         self.e1.focus_set()
-        b1 = tk.Button(self, text='确定', command=self.Ok)
+        b1 = tk.Button(self, text='确定', command=self.ok)
         b1.grid(row=2, column=0)
-        b2 = tk.Button(self, text='取消', command=self.Cancel)
+        b2 = tk.Button(self, text='取消', command=self.cancel)
         b2.grid(row=2, column=1)
 
         self.userpass = main.readconf()
         if self.userpass is not 8:
-            # self.v1.set(self.userpass[0])
-            # self.v2.set(self.userpass[1])
             self.e1.insert(0, self.userpass[0])
             self.e1.select_range(0, tk.END)
             self.e2.insert(0, self.userpass[1])
@@ -291,7 +274,7 @@ class MyDialog(tk.Frame):
 
         self.pack()
 
-    def Ok(self, evt=None):
+    def ok(self, evt=None):
         global userpass
         self.userpass = (self.e1.get(), self.e2.get())
         if '' not in self.userpass:
@@ -302,16 +285,16 @@ class MyDialog(tk.Frame):
         self.master.destroy()
         self.quit()
 
-    def Cancel(self):
+    def cancel(self):
         self.destroy()
         self.master.destroy()
         self.quit()
 
 
-def getUserpass(evt=None):
+def get_userpass(evt=None):
     global userpass
     root2 = tk.Tk()
-    myapp = MyDialog(root2)
+    myapp = UserpassDialog(root2)
     myapp.master.title("请输入账号密码：")
     # myapp.master.maxsize(1000, 400)
     myapp.mainloop()
@@ -321,8 +304,8 @@ def getUserpass(evt=None):
 
 if __name__ == "__main__":
     root = tk.Tk()
-    app = Application(master=root)
-    userpass = main.loadconf(getUserpass)
+    app = LzuautoUI(master=root)
+    userpass = main.loadconf(get_userpass)
     app.mainloop()
     # root.destroy()
 
