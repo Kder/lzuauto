@@ -8,8 +8,21 @@ import shutil
 import main
 import lzuauto
 
-if len(sys.argv) == 1:
+
+req_gtk = req_tk = req_src = False
+if len(sys.argv) is 1:
     sys.argv.append('py2exe')
+    req_gtk = req_tk = req_src = True
+elif len(sys.argv) is 2:
+    if sys.argv[1] == 'src':
+        print(sys.argv)
+        req_src = True
+    if sys.argv[1] == 'tk':
+        req_tk = True
+    if sys.argv[1] == 'gtk':
+        req_gtk = True
+
+
 version = main.__version__
 revision = main.__revision__.split(':')[1][:-1].strip()
 main_exe = {"script": "main.pyw",
@@ -54,15 +67,17 @@ options_lzuauto = {'py2exe': {'bundle_files': 3,
             }
 }
 
-setup(name = 'lzuauto-tk',
-      windows=[lzuauto_exe],
-      options = options_lzuauto,
-)
-setup(name = 'lzuauto-gtk',
-      windows=[main_exe],
-      zipfile = None,
-      options = options_main,
-)
+if req_tk:
+    setup(name = 'lzuauto-tk',
+          windows=[lzuauto_exe],
+          options = options_lzuauto,
+    )
+if req_gtk:
+    setup(name = 'lzuauto-gtk',
+          windows=[main_exe],
+          zipfile = None,
+          options = options_main,
+    )
 #sys.exit()
 
 base_files = [
@@ -81,24 +96,26 @@ src_files = base_files + [
 src_args = ' '.join(src_files)
 
 try:
-    for i in base_files:
-        for j in ['lzuauto-gtk', 'lzuauto-tk']:
-            if os.path.isdir(i):
-                if not os.path.isdir(j + os.sep + i):
-                    shutil.copytree(i, j + os.sep + i)
-            else:
-                shutil.copy(i, j)
-    for i in ['etc', 'lib', 'share']:
-        if not os.path.isdir('lzuauto-gtk' + os.sep + i):
-            shutil.copytree(i, 'lzuauto-gtk' + os.sep + i)
-    os.system('upx lzuauto-gtk/*.pyd lzuauto-gtk/*.exe lzuauto-gtk/*.dll')
-    os.system('upx lzuauto-tk/*.pyd lzuauto-tk/*.exe lzuauto-tk/*.dll')
-
-    os.system('7z a -xr!*.svn* lzuauto-%s.%s-src.zip %s' % \
-                (version, revision, src_args))
-    os.system('7z a -xr!*.svn* -xr!*/tessdata -xr!*/leptonlib.dll \
+    if req_tk and req_gtk:
+        for i in base_files:
+            for j in ['lzuauto-gtk', 'lzuauto-tk']:
+                if os.path.isdir(i):
+                    if not os.path.isdir(j + os.sep + i):
+                        shutil.copytree(i, j + os.sep + i)
+                else:
+                    shutil.copy(i, j)
+        for i in ['etc', 'lib', 'share']:
+            if not os.path.isdir('lzuauto-gtk' + os.sep + i):
+                shutil.copytree(i, 'lzuauto-gtk' + os.sep + i)
+        
+        os.system('upx lzuauto-gtk/*.pyd lzuauto-gtk/*.exe lzuauto-gtk/*.dll')
+        os.system('upx lzuauto-tk/*.pyd lzuauto-tk/*.exe lzuauto-tk/*.dll')
+        os.system('7z a -xr!*.svn* -xr!*/tessdata -xr!*/leptonlib.dll \
 -xr!*/tesseract.exe lzuauto-%s.%s-win-gtk.zip lzuauto-gtk' % 
         (version, revision))
+    if req_src:
+        os.system('7z a -xr!*.svn* lzuauto-%s.%s-src.zip %s' % \
+                (version, revision, src_args))
 
 except Exception,e:
     sys.stderr.write(str(e))
@@ -132,6 +149,6 @@ tk_files = [
 ]
 
 tk_args = ' '.join(tk_files)
-
-os.system(r'7z a -xr!*.svn* lzuauto-%s.%s-win-tk.zip %s' % \
+if req_tk:
+    os.system(r'7z a -xr!*.svn* lzuauto-%s.%s-win-tk.zip %s' % \
             (version, revision, tk_args))
