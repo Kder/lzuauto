@@ -5,3 +5,5 @@ style "user-font" {
 widget_class "*" style "user-font"
 
 gtk-font-name="msst 9"
+
+gtk-theme-name = "Aurora"

@@ -88,8 +88,9 @@ try:
                     shutil.copytree(i, j + os.sep + i)
             else:
                 shutil.copy(i, j)
-    if not os.path.isdir('lzuauto-gtk' + os.sep + 'etc'):
-        shutil.copytree('etc', 'lzuauto-gtk' + os.sep + 'etc')
+    for i in ['etc', 'lib', 'share']:
+    if not os.path.isdir('lzuauto-gtk' + os.sep + i):
+        shutil.copytree('etc', 'lzuauto-gtk' + os.sep + i)
     os.system('upx lzuauto-gtk/*.pyd lzuauto-gtk/*.exe lzuauto-gtk/*.dll')
     os.system('upx lzuauto-tk/*.pyd lzuauto-tk/*.exe lzuauto-tk/*.dll')
 
