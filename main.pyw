@@ -552,7 +552,6 @@ if __name__ == "__main__":
         </ui>'''
 
         def login(self, widget, data=None):
-            #print 'login'
             userpass = loadconf(getUserpass)
             result = login(userpass)
             if result is 1 or 'M)' in result:
@@ -566,12 +565,8 @@ if __name__ == "__main__":
                     icon=gtk.MESSAGE_ERROR)
 
         def logout(self, widget, data=None):
-            #print 'logout'
-            if logout():
-                self.Dialog(lzuauto_text['TITLE_LOGOUT'],
-                    lzuauto_text['MSG_LOGOUT'])
-            else:
-                self.logout
+            result = logout()
+            self.Dialog(lzuauto_text['TITLE_LOGOUT'], result)
 
         def checkflow(self, widget, data=None):
             userpass = loadconf(getUserpass)
