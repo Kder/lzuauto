@@ -10,11 +10,12 @@ import lzuauto
 
 if len(sys.argv) == 1:
     sys.argv.append('py2exe')
-
+version = main.__version__
+revision = main.__revision__.split(':')[1][:-1].strip()
 main_exe = {"script": "main.pyw",
 "icon_resources": [(0,'lzuauto.ico')],
 "name": "lzuauto",
-"version": '%s.%s' % (main.__version__, main.__revision__.split(':')[1][:-1].strip()),
+"version": '%s.%s' % (version, revision),
 "description": u"兰大上网认证系统客户端",
 "author": ['ysjdxcn','Kder'],
 "copyright": 'Copyright 2010 ysjdxcn, Kder',
@@ -25,7 +26,7 @@ main_exe = {"script": "main.pyw",
 
 lzuauto_exe = main_exe.copy()
 lzuauto_exe["script"] = 'lzuauto.pyw'
-lzuauto_exe["version"] = '%s.%s' % (lzuauto.__version__, lzuauto.__revision__.split(':')[1][:-1].strip())
+lzuauto_exe["version"] = '%s.%s' % (version, lzuauto.__revision__.split(':')[1][:-1].strip())
 
 options_main = {'py2exe': {'bundle_files': 3,
             'optimize': 2,
@@ -92,9 +93,9 @@ try:
     os.system('upx lzuauto-gtk/*.pyd lzuauto-gtk/*.exe lzuauto-gtk/*.dll')
     os.system('upx lzuauto-tk/*.pyd lzuauto-tk/*.exe lzuauto-tk/*.dll')
 
-    os.system('7z a -xr!*.svn* lzuauto-%s-src.zip %s' % \
-                (main.__version__, src_args))
-    os.system('7z a -xr!*.svn* lzuauto-%s-win-gtk.zip lzuauto-gtk' % main.__version__)
+    os.system('7z a -xr!*.svn* lzuauto-%s.%s-src.zip %s' % \
+                (version, revision, src_args))
+    os.system('7z a -xr!*.svn* lzuauto-%s.%s-win-gtk.zip lzuauto-gtk' % (version, revision))
 except Exception,e:
     sys.stderr.write(str(e))
     sys.stderr.write('Error.')
@@ -103,7 +104,7 @@ except Exception,e:
 
 # os.system('7z a -t7z -xr!*.svn* lzuauto-%s-win.7z lzuauto/main.exe \
 # lzuauto/conf.txt lzuauto/tesseract.exe lzuauto/tessdata \
-# lzuauto/leptonlib.dll' % main.__version__)
+# lzuauto/leptonlib.dll' % version)
 
 tk_files = [
 'lzuauto-tk/conf.txt',
@@ -129,5 +130,5 @@ tk_files = [
 
 tk_args = ' '.join(tk_files)
 
-os.system(r'7z a -xr!*.svn* lzuauto-%s-win-tk.zip %s' % \
-            (lzuauto.__version__, tk_args))
+os.system(r'7z a -xr!*.svn* lzuauto-%s.%s-win-tk.zip %s' % \
+            (version, revision, tk_args))
