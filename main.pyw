@@ -107,11 +107,11 @@ TFMMSG = {0: '',
           'error_userpass': '帐号或密码不对，请重新输入\n',
           'find1': '本帐号',
 }
-option = "alert\((.*?)\);"
-# option = "'\(.*?\)'"
-option1 = '<td bgcolor=\"FFFBF0\" align=\"center\" colspan=5>(.*?)MB'
-option2 = '<td bgcolor=\"FFFBF0\" align=\"center\" colspan=5>(.*?)Hours'
-option3 = '<font color=red>(.*?)</font>'
+pattern0 = "alert\((.*?)\);"
+# pattern0 = "'\(.*?\)'"
+pattern1 = '<td bgcolor=\"FFFBF0\" align=\"center\" colspan=5>(.*?)MB'
+pattern2 = '<td bgcolor=\"FFFBF0\" align=\"center\" colspan=5>(.*?)Hours'
+pattern3 = '<font color=red>(.*?)</font>'
 # path0 = os.path.dirname(sys.path[0])
 path0 = sys.path[0]
 if os.path.isdir(sys.path[0]):
@@ -122,9 +122,9 @@ else:
 
 CONF = PROGRAM_PATH + os.sep + 'conf.txt'
 CONF2 = PROGRAM_PATH + os.sep + 'lzuauto.ini'
-isPy2 = False
+ispy2 = False
 if sys.version_info.major is 2:
-    isPy2 = True
+    ispy2 = True
     for i in lzuauto_text:
         lzuauto_text[i] = unicode(lzuauto_text[i], 'utf-8')
     for i in TFMMSG:
@@ -161,7 +161,7 @@ def loadconf(getuserpass):
 
 
 # for Linux
-def get_ip_address(ifname):
+def get_ip_lin(ifname):
     import socket
     import fcntl
     import struct
@@ -172,12 +172,12 @@ def get_ip_address(ifname):
         struct.pack('256s', ifname[:15])
     )[20:24])
 
-#get_ip_address('lo')
-#get_ip_address('eth0')
+#get_ip_lin('lo')
+#get_ip_lin('eth0')
 
 
 # for Windows
-def getIPAddresses():
+def get_ip_win():
     from ctypes import Structure, windll, sizeof
     from ctypes import POINTER, byref
     from ctypes import c_ulong, c_uint, c_ubyte, c_char
@@ -225,7 +225,7 @@ def getIPAddresses():
     if rc == 0:
         for a in adapterList:
             adNode = a.ipAddressList
-            if isPy2:
+            if ispy2:
                 while True:
                     ipAddr = adNode.ipAddress
                     if ipAddr:
@@ -241,9 +241,9 @@ def getIPAddresses():
 
 def get_ip():
     if sys.platform == 'win32':
-        return [x for x in getIPAddresses()]
+        return [x for x in get_ip_win()]
     else:
-        return get_ip_address('eth0')
+        return get_ip_lin('eth0')
 
 ip = get_ip()[0]
 
@@ -270,7 +270,7 @@ def get_http_res(host, path, params=None, headers=None):
     return data
 
 
-def DispTFM(Msg, msga):
+def tfm(Msg, msga):
     if int(Msg) == 1:
         if msga != '':
             try:
@@ -289,7 +289,7 @@ def process_ret(ret):
     # print msg,msga,ret
     msg1 = ''
     if msg != [] and msga != []:
-        msg1 = DispTFM(msg[0], msga[0])
+        msg1 = tfm(msg[0], msga[0])
         if msg1 == TFMMSG['error_userpass']:
             return msg1
     flow = re.findall("flow='([\d.]+)\s*'", ret)
@@ -351,7 +351,7 @@ def logout():
     # "Accept": "text/plain"}
     # data = get_http_res("202.201.1.140", "/portalAuthAction.do",
 #    params, headers)
-    # result = re.findall(option, data)
+    # result = re.findall(pattern0, data)
     # if len(result)>0:
         # if result[0] == 'temp':
             # result = re.findall("var temp=('.+?')", data)
@@ -458,7 +458,7 @@ def verify(userpass, headers):
                                 'validateCode': s})
     data = get_http_res('a.lzu.edu.cn', '/selfLogonAction.do', params,
                 headers)
-    err = re.findall(option3, data)
+    err = re.findall(pattern3, data)
 #    if 'selfLogon' in response2.getheaders()[3][1]:
 #    print(err)
     return err
@@ -500,8 +500,8 @@ rv:1.9.2.10)Gecko/20101020 Firefox/3.6.11",
     data = get_http_res("a.lzu.edu.cn", '/userQueryAction.do',
         headers=headers)
 
-    mb = re.findall(option1, data)
-    hour = re.findall(option2, data)
+    mb = re.findall(pattern1, data)
+    hour = re.findall(pattern2, data)
 
     if len(mb) > 0:
         MB = mb[0].split('&nbsp')[0][1:]
@@ -552,7 +552,7 @@ if __name__ == "__main__":
         </ui>'''
 
         def login(self, widget, data=None):
-            userpass = loadconf(getUserpass)
+            userpass = loadconf(get_userpass)
             result = login(userpass)
             if result is 1 or 'M)' in result:
                 self.Dialog(lzuauto_text['TITLE_LOGIN'],
@@ -569,7 +569,7 @@ if __name__ == "__main__":
             self.Dialog(lzuauto_text['TITLE_LOGOUT'], result)
 
         def checkflow(self, widget, data=None):
-            userpass = loadconf(getUserpass)
+            userpass = loadconf(get_userpass)
             flow = checkflow(userpass)
             if type(flow) is type(tuple()):
                 self.Dialog(lzuauto_text['TITLE_FLOW'],
@@ -667,7 +667,7 @@ if __name__ == "__main__":
              ('Usage', gtk.STOCK_INFO, '用法(_U)',
                None, lzuauto_text['TITLE_USAGE'], self.Usage),
              ('Userpass', gtk.STOCK_DIALOG_AUTHENTICATION, '账号(_U)',
-               None, lzuauto_text['TITLE_USAGE'], getUserpass),
+               None, lzuauto_text['TITLE_USAGE'], get_userpass),
              ('File', gtk.STOCK_FILE, '文件(_F)'),
              ('Settings', gtk.STOCK_PROPERTIES, '设置(_S)'),
              ('Help', gtk.STOCK_HELP, '帮助(_H)'),
@@ -718,7 +718,7 @@ if __name__ == "__main__":
             win.modify_font(pango.FontDescription("sans 9"))
             win.show_all()
 
-    def getUserpass(widget):
+    def get_userpass(widget):
         def responseToDialog(entry, dialog, response):
             dialog.response(response)
         #base this on a message dialog
@@ -771,7 +771,7 @@ if __name__ == "__main__":
         return userpass
 
     start = Interface()
-    loadconf(getUserpass)
+    loadconf(get_userpass)
     gtk.main()
 
 #vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4
